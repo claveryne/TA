@@ -76,9 +76,9 @@ class PemesananController extends Controller
                 return [
                     'title' => $title,
                     'start' => $booking->tgl_mulai,
-                    'end' => date('Y-m-d', strtotime($booking->tgl_selesai . ' +1 day')),
+                    'end' => $booking->tgl_selesai,
                     'color' => $color,
-                    'allDay' => true
+                    'allDay' => false
                 ];
             });
 
@@ -192,9 +192,9 @@ class PemesananController extends Controller
                 return [
                     'title' => $title,
                     'start' => $booking->tgl_mulai,
-                    'end' => date('Y-m-d', strtotime($booking->tgl_selesai . ' +1 day')),
+                    'end' => $booking->tgl_selesai,
                     'color' => $color,
-                    'allDay' => true
+                    'allDay' => false
                 ];
             });
 
@@ -223,9 +223,9 @@ class PemesananController extends Controller
                 return [
                     'title' => $title,
                     'start' => $booking->tgl_mulai,
-                    'end' => date('Y-m-d', strtotime($booking->tgl_selesai . ' +1 day')),
+                    'end' => $booking->tgl_selesai,
                     'color' => $color,
-                    'allDay' => true
+                    'allDay' => false
                 ];
             });
 
@@ -243,10 +243,20 @@ class PemesananController extends Controller
                 'alamat_pemesan' => 'required|string|max:255',
                 'jumlah_orang' => 'required|integer',
                 'tgl_mulai' => 'required|date',
-                'tgl_selesai' => 'required|date|after_or_equal:tgl_mulai',
+                'tgl_selesai' => 'required|date|after:tgl_mulai',
                 'id_ruangan' => 'nullable|integer',
                 'keterangan_pemesanan' => 'nullable|string'
             ]);
+
+            $mulai = \Carbon\Carbon::parse($request->tgl_mulai);
+            $selesai = \Carbon\Carbon::parse($request->tgl_selesai);
+            
+            if ($selesai->lte($mulai)) {
+                throw new Exception('Waktu selesai harus lebih dari waktu mulai.');
+            }
+            if ($mulai->diffInMinutes($selesai) < 60) {
+                throw new Exception('Durasi pemesanan minimal 1 jam.');
+            }
 
             Log::info('Mencoba menambahkan data pemesanan baru: ' . $request->nama_pemesan);
             DB::beginTransaction();
@@ -256,12 +266,12 @@ class PemesananController extends Controller
                 $isRoomBooked = Pemesanan::where('id_ruangan', $request->id_ruangan)
                     ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak'])
                     ->where(function ($query) use ($request) {
-                        $query->where('tgl_mulai', '<=', $request->tgl_selesai)
-                            ->where('tgl_selesai', '>=', $request->tgl_mulai);
+                        $query->where('tgl_mulai', '<', $request->tgl_selesai)
+                            ->where('tgl_selesai', '>', $request->tgl_mulai);
                     })->exists();
 
                 if ($isRoomBooked) {
-                    throw new Exception('Ruangan sudah dipesan pada tanggal tersebut.');
+                    throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
                 }
             }
 
@@ -277,8 +287,8 @@ class PemesananController extends Controller
                             $used_qty = DetailFasilitas::where('id_fasilitas', $fasilitas_id)
                                 ->whereHas('pemesanan', function ($query) use ($request) {
                                     $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                        ->where('tgl_mulai', '<=', $request->tgl_selesai)
-                                        ->where('tgl_selesai', '>=', $request->tgl_mulai);
+                                        ->where('tgl_mulai', '<', $request->tgl_selesai)
+                                        ->where('tgl_selesai', '>', $request->tgl_mulai);
                                 })->sum('jumlah_fasilitas');
 
                             $available_qty = $facility->jumlah_fasilitas - $used_qty;
@@ -300,7 +310,7 @@ class PemesananController extends Controller
                 'alamat_pemesan' => $request->alamat_pemesan,
                 'nama_acara' => $request->nama_acara,
                 'jumlah_orang' => $request->jumlah_orang,
-                'tgl_pesan' => now()->toDateString(),
+                'tgl_pesan' => now(),
                 'tgl_mulai' => $request->tgl_mulai,
                 'tgl_selesai' => $request->tgl_selesai,
                 'status_pemesanan' => 'Menunggu',
@@ -393,10 +403,20 @@ class PemesananController extends Controller
                 'alamat_pemesan' => 'required|string|max:255',
                 'jumlah_orang' => 'required|integer',
                 'tgl_mulai' => 'required|date',
-                'tgl_selesai' => 'required|date|after_or_equal:tgl_mulai',
+                'tgl_selesai' => 'required|date|after:tgl_mulai',
                 'id_ruangan' => 'nullable|integer',
                 'keterangan_pemesanan' => 'nullable|string'
             ]);
+
+            $mulai = \Carbon\Carbon::parse($request->tgl_mulai);
+            $selesai = \Carbon\Carbon::parse($request->tgl_selesai);
+            
+            if ($selesai->lte($mulai)) {
+                throw new Exception('Waktu selesai harus lebih dari waktu mulai.');
+            }
+            if ($mulai->diffInMinutes($selesai) < 60) {
+                throw new Exception('Durasi pemesanan minimal 1 jam.');
+            }
 
             DB::beginTransaction();
 
@@ -406,12 +426,12 @@ class PemesananController extends Controller
                     ->where('id_pemesanan', '!=', $id)
                     ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
                     ->where(function ($query) use ($request) {
-                        $query->where('tgl_mulai', '<=', $request->tgl_selesai)
-                            ->where('tgl_selesai', '>=', $request->tgl_mulai);
+                        $query->where('tgl_mulai', '<', $request->tgl_selesai)
+                            ->where('tgl_selesai', '>', $request->tgl_mulai);
                     })->exists();
 
                 if ($isRoomBooked) {
-                    throw new Exception('Ruangan sudah dipesan pada tanggal tersebut.');
+                    throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
                 }
             }
 
@@ -428,8 +448,8 @@ class PemesananController extends Controller
                                 ->whereHas('pemesanan', function ($query) use ($request, $id) {
                                     $query->where('id_pemesanan', '!=', $id)
                                         ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                        ->where('tgl_mulai', '<=', $request->tgl_selesai)
-                                        ->where('tgl_selesai', '>=', $request->tgl_mulai);
+                                        ->where('tgl_mulai', '<', $request->tgl_selesai)
+                                        ->where('tgl_selesai', '>', $request->tgl_mulai);
                                 })->sum('jumlah_fasilitas');
 
                             $available_qty = $facility->jumlah_fasilitas - $used_qty;
@@ -523,7 +543,7 @@ class PemesananController extends Controller
                 $pemesanan->save();
 
                 try {
-                    $admins = \App\Models\User::where('role', 'Admin')->get();
+                    $admins = User::where('role', 'Admin')->get();
                     foreach ($admins as $admin) {
                         Mail::to($admin->email)->send(new AdminNotificationMail($pemesanan, 'batal'));
                     }

@@ -15,6 +15,10 @@
     <!-- Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     
     <style>
         :root {
@@ -299,7 +303,7 @@
                         <a href="https://www.instagram.com/legacy.jogja/"><i class="fa-brands fa-instagram"></i></a>
                         <a href="https://www.tiktok.com/@legacy.jogja"><i class="fa-brands fa-tiktok"></i></a>
                         <a href="https://www.facebook.com/legacy.jogja/"><i class="fa-brands fa-facebook-f"></i></a>
-                        <a href="https://www.youtube.com/@legacy.jogja"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="https://www.youtube.com/@LegacyJogja"><i class="fa-brands fa-youtube"></i></a>
                     </div>
                 </div>
                 
@@ -316,8 +320,8 @@
                 <div class="col-lg-3 col-md-6">
                     <h5>Hubungi Kami</h5>
                     <ul>
-                        <li><i class="fa-solid fa-phone me-2"></i> 085 369 369 365</li>
-                        <li><i class="fa-solid fa-envelope me-2"></i> legacyjogja@gmail.com</li>
+                        <li><a href="Https://wa.me/6285369369365"><i class="fa-solid fa-brands fa-whatsapp me-2"></i> 085 369 369 365</li></a>
+                        <li><a href="mailto:[legacyjogja@gmail.com]"><i class="fa-solid fa-envelope me-2"></i> legacyjogja@gmail.com</li></a>
                     </ul>
                 </div>
 
@@ -336,6 +340,18 @@
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ENjdO4Dr2bkBIFxQpeoTz1HIcje39Wm4jDKdf19U8gI4ddQ3GYNS7NTKfAdVQSZe" crossorigin="anonymous"></script>
     
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            flatpickr('input[type="datetime-local"]', {
+                enableTime: true,
+                dateFormat: "Y-m-d\\ H:i",
+                time_24hr: true,
+                locale: "id",
+                disableMobile: true
+            });
+        });
+    </script>
+
     @stack('scripts')
 </body>
 </html>

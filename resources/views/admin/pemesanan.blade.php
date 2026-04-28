@@ -334,8 +334,8 @@
 
                     // Dates
                     $tglPesan = \Carbon\Carbon::parse($item->tgl_pesan)->translatedFormat('d F Y');
-                    $tglMulai = \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d F Y');
-                    $tglSelesai = \Carbon\Carbon::parse($item->tgl_selesai)->translatedFormat('d F Y');
+                    $tglMulai = \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d F Y, H:i');
+                    $tglSelesai = \Carbon\Carbon::parse($item->tgl_selesai)->translatedFormat('d F Y, H:i');
                     $tglAcara = ($tglMulai == $tglSelesai) ? $tglMulai : $tglMulai . ' - ' . $tglSelesai;
                 @endphp
                 <div class="pemesanan-card">
@@ -419,7 +419,7 @@
                                     </div>
                                     
                                     <div class="col-md-6 mb-3">
-                                        <label class="text-muted small">Tanggal Acara</label>
+                                        <label class="text-muted small">Waktu Acara</label>
                                         <p class="fw-bold mb-0">{{ $tglAcara }}</p>
                                     </div>
                                     
@@ -520,12 +520,12 @@
                                             <input type="number" name="jumlah_orang" class="form-control" value="{{ $item->jumlah_orang }}" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label text-muted small">Tanggal Mulai <span class="text-danger">*</span></label>
-                                            <input type="date" name="tgl_mulai" class="form-control" value="{{ $item->tgl_mulai }}" required>
+                                            <label class="form-label text-muted small">Waktu Mulai <span class="text-danger">*</span></label>
+                                            <input type="datetime-local" name="tgl_mulai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_mulai)) }}" required>
                                         </div>
                                         <div class="col-md-4">
-                                            <label class="form-label text-muted small">Tanggal Selesai <span class="text-danger">*</span></label>
-                                            <input type="date" name="tgl_selesai" class="form-control" value="{{ $item->tgl_selesai }}" required>
+                                            <label class="form-label text-muted small">Waktu Selesai <span class="text-danger">*</span></label>
+                                            <input type="datetime-local" name="tgl_selesai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_selesai)) }}" required>
                                         </div>
                                         <div class="col-md-12">
                                             <label class="form-label text-muted small">Pilih Ruangan <span class="text-danger">*</span></label>

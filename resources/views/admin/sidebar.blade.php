@@ -25,6 +25,10 @@
     <!-- Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
+    <!-- Flatpickr -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://npmcdn.com/flatpickr/dist/l10n/id.js"></script>
     <!-- Ion Icon -->
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
@@ -388,6 +392,14 @@
                 linkItems[i].classList.add("active");
             });
         }
+
+        flatpickr('input[type="datetime-local"]', {
+            enableTime: true,
+            dateFormat: "Y-m-d\\ H:i",
+            time_24hr: true,
+            locale: "id",
+            disableMobile: true
+        });
     </script>
 
 </body>

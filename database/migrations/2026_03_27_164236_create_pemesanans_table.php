@@ -20,9 +20,9 @@ return new class extends Migration
             $table->string('alamat_pemesan', 255);
             $table->string('nama_acara', 255);
             $table->integer('jumlah_orang');
-            $table->date('tgl_pesan');
-            $table->date('tgl_mulai');
-            $table->date('tgl_selesai');
+            $table->dateTime('tgl_pesan');
+            $table->dateTime('tgl_mulai');
+            $table->dateTime('tgl_selesai');
             $table->string('status_pemesanan', 20);
             $table->string('bukti_pemesanan', 255)->nullable();
             $table->string('keterangan_pemesanan', 255)->nullable();

@@ -65,11 +65,11 @@
                 <td>{{ $pemesanan->nama_acara }}</td>
             </tr>
             <tr>
-                <td><strong>Tanggal Acara</strong></td>
+                <td><strong>Waktu Acara</strong></td>
                 <td>
-                    {{ \Carbon\Carbon::parse($pemesanan->tgl_mulai)->translatedFormat('d F Y') }}
+                    {{ \Carbon\Carbon::parse($pemesanan->tgl_mulai)->translatedFormat('d F Y, H:i') }}
                     @if($pemesanan->tgl_mulai != $pemesanan->tgl_selesai)
-                        - {{ \Carbon\Carbon::parse($pemesanan->tgl_selesai)->translatedFormat('d F Y') }}
+                        - {{ \Carbon\Carbon::parse($pemesanan->tgl_selesai)->translatedFormat('d F Y, H:i') }}
                     @endif
                 </td>
             </tr>

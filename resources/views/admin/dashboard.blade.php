@@ -426,6 +426,11 @@
                     left: 'prev,next',
                     center: 'title',
                     right: 'today',
+                },
+                eventTimeFormat: {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    hour12: false
                 }
             });
             cal.render();

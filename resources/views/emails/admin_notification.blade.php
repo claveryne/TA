@@ -27,12 +27,12 @@
                 <td style="padding: 8px; border: 1px solid #ddd;">{{ $pemesanan->nama_acara }}</td>
             </tr>
             <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Tanggal Mulai</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">{{ \Carbon\Carbon::parse($pemesanan->tgl_mulai)->format('d M Y') }}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Waktu Mulai</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{{ \Carbon\Carbon::parse($pemesanan->tgl_mulai)->format('d M Y, H:i') }}</td>
             </tr>
             <tr>
-                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Tanggal Selesai</td>
-                <td style="padding: 8px; border: 1px solid #ddd;">{{ \Carbon\Carbon::parse($pemesanan->tgl_selesai)->format('d M Y') }}</td>
+                <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold;">Waktu Selesai</td>
+                <td style="padding: 8px; border: 1px solid #ddd;">{{ \Carbon\Carbon::parse($pemesanan->tgl_selesai)->format('d M Y, H:i') }}</td>
             </tr>
         </table>
         

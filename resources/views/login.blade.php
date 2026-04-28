@@ -128,19 +128,13 @@
                         </div>
                     </div>
                     
-                    <form method="POST" action="{{ route('login') }}">
-                        @csrf
-                        
-                        <button type="submit" class="btn btn-primary w-100 login-btn">
-                            <a href="{{ route('google.login') }}" style="text-decoration: none; color: white;">
-                                <i class="fa-brands fa-google"></i>Sign in with Google
-                            </a>
-                        </button>
-                    </form>
+                    <a href="{{ route('google.login') }}" class="btn btn-primary w-100 login-btn d-flex justify-content-center align-items-center" style="text-decoration: none; color: white;">
+                        <i class="fa-brands fa-google"></i> Sign in with Google
+                    </a>
                     
                     <div class="text-center mt-4">
                         <p class="mb-2">Belum punya akun Google?</p>
-                        <a href="https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Faccounts.google.com%2F&dsh=S-1643713193%3A1774876911815281&followup=https%3A%2F%2Faccounts.google.com%2F&passive=1209600&flowName=GlifWebSignIn&flowEntry=ServiceLogin&ifkv=AT1y2_WucmkwcOhg4JSC1V-y1ieOXLz83eNNV8_43rkYMy-AFnXsbFI7T39b2cMtAihw8--HnkQ4sA" 
+                        <a href="https://accounts.google.com/v3/signin/identifier?dsh=S640093762%3A1777370526736286&flowName=GlifWebSignIn&flowEntry=ServiceLogin&ifkv=AWa2PatZt9RdqnAsmlqUg_mnZ8rPN-JS1uxaaAQLrfSbb5An5JLuWwqXomSawVdvDuTE9F_eRV--hw" 
                         class="text-decoration-none fw-bold text-secondary">Daftar Sekarang</a>
                     </div>
                 </div>

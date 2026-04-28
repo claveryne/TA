@@ -715,15 +715,11 @@
                         <div class="row g-3">
                             <div class="col-md-12">
                                 <label class="modern-label">Instansi - Acara<span class="text-danger">*</span></label>
-                                <input type="text" name="nama_acara" class="modern-input" placeholder="Nama Instansi - Acara" required>
+                                <input type="text" name="nama_acara" class="modern-input" placeholder="Nama Instansi - Nama Acara" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="modern-label">Jumlah Orang<span class="text-danger">*</span></label>
                                 <input type="number" name="jumlah_orang" class="modern-input" placeholder="Kapasitas" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="modern-label">Tanggal Mulai<span class="text-danger">*</span></label>
-                                <input type="date" name="tgl_mulai" class="modern-input" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="modern-label">Pilih Ruangan<span class="text-danger">*</span></label>
@@ -735,8 +731,12 @@
                                 </select>
                             </div>
                             <div class="col-md-6">
-                                <label class="modern-label">Tanggal Selesai<span class="text-danger">*</span></label>
-                                <input type="date" name="tgl_selesai" class="modern-input" required>
+                                <label class="modern-label">Waktu Mulai<span class="text-danger">*</span></label>
+                                <input type="datetime-local" name="tgl_mulai" placeholder="Pilih Tanggal dan Jam" class="modern-input" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="modern-label">Waktu Selesai<span class="text-danger">*</span><small style="margin-left: 10px; color: #9e9e9e;">Minimal 1 Jam</small></label>
+                                <input type="datetime-local" name="tgl_selesai" placeholder="Pilih Tanggal dan Jam" class="modern-input" required>
                             </div>
                             <div class="col-12 mt-4">
                                 <label class="modern-label mb-3">Fasilitas Tambahan (Opsional)</label>
@@ -815,6 +815,11 @@
                 left: 'prev,next',
                 center: 'title',
                 right: 'today',
+            },
+            eventTimeFormat: {
+                hour: '2-digit',
+                minute: '2-digit',
+                hour12: false
             }
         });
         calendar.render();

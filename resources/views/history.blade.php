@@ -281,8 +281,8 @@
 
                     // Dates
                     $tglPesan = \Carbon\Carbon::parse($item->tgl_pesan)->translatedFormat('d F Y');
-                    $tglMulai = \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d F Y');
-                    $tglSelesai = \Carbon\Carbon::parse($item->tgl_selesai)->translatedFormat('d F Y');
+                    $tglMulai = \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d F Y, H:i');
+                    $tglSelesai = \Carbon\Carbon::parse($item->tgl_selesai)->translatedFormat('d F Y, H:i');
                     $tglAcara = ($tglMulai == $tglSelesai) ? $tglMulai : $tglMulai . ' - ' . $tglSelesai;
                 @endphp
                 <div class="history-card">
@@ -361,7 +361,7 @@
                                     </div>
                                     
                                     <div class="col-md-6 mb-3">
-                                        <label class="text-muted small">Tanggal Acara</label>
+                                        <label class="text-muted small">Waktu Acara</label>
                                         <p class="fw-bold mb-0">{{ $tglAcara }}</p>
                                     </div>
                                     
