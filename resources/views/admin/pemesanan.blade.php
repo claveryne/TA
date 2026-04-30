@@ -4,6 +4,27 @@
 
 @push('styles')
     <style>
+        /* Tombol Cetak */
+        .btn-cetak {
+            background-color: transparent;
+            color: #994D1C;
+            border: 1.5px solid #6B240D;
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+        .btn-cetak:hover {
+            background-color: #6B240D;
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
         .pemesanan-title {
             color: #612713;
             font-weight: 700;
@@ -211,7 +232,7 @@
         .search-box {
             position: relative;
             width: 100%;
-            max-width: 250px;
+            max-width: 180px;
         }
 
         .search-box input {
@@ -297,11 +318,16 @@
                     class="tab-link {{ $activeTab == 'dibatalkan' ? 'active' : '' }}">Dibatalkan / Ditolak</a>
             </div>
 
-            <form action="{{ route('pemesanan') }}" method="GET" class="search-box">
-                <input type="hidden" name="tab" value="{{ $activeTab }}">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" name="search" placeholder="Cari pemesanan..." value="{{ request('search') }}">
-            </form>
+            <div class="d-flex justify-content-end gap-3">
+                <button class="btn-cetak" data-bs-toggle="modal" data-bs-target="#modalCetakLaporan">
+                    <i class="fa-solid fa-file-pdf"></i> Laporan Pemesanan
+                </button>
+                <form action="{{ route('pemesanan') }}" method="GET" class="search-box">
+                    <input type="hidden" name="tab" value="{{ $activeTab }}">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" name="search" placeholder="Cari..." value="{{ request('search') }}">
+                </form>
+            </div>
         </div>
 
         @if(count($pemesanans) > 0)
@@ -593,6 +619,61 @@
             </div>
         @endif
 
+    </div>
+
+    <!-- MODAL CETAK LAPORAN PEMESANAN -->
+    <div class="modal fade" id="modalCetakLaporan" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
+                <div class="modal-header text-white" style="background-color: #612713; border: none; padding: 20px;">
+                    <h5 class="modal-title w-100 text-center fw-bold" style="font-size: 1.5rem;">Cetak Laporan Pemesanan</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                
+                <form action="{{ route('pemesanan.laporan') }}" method="POST" target="_blank">
+                    @csrf
+                    <div class="modal-body p-4" style="background-color: #ffffff;">
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Bulan<span style="color: red;">*</span></label>
+                                <select name="bulan" class="form-select custom-input" required>
+                                    <option value="" selected disabled>Pilih Bulan</option>
+                                    <option value="01">Januari</option>
+                                    <option value="02">Februari</option>
+                                    <option value="03">Maret</option>
+                                    <option value="04">April</option>
+                                    <option value="05">Mei</option>
+                                    <option value="06">Juni</option>
+                                    <option value="07">Juli</option>
+                                    <option value="08">Agustus</option>
+                                    <option value="09">September</option>
+                                    <option value="10">Oktober</option>
+                                    <option value="11">November</option>
+                                    <option value="12">Desember</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label fw-bold">Tahun<span style="color: red;">*</span></label>
+                                <select name="tahun" class="form-select custom-input" required>
+                                    <option value="" selected disabled>Pilih Tahun</option>
+                                    @for($i = date('Y'); $i >= date('Y') - 5; $i--)
+                                        <option value="{{ $i }}">{{ $i }}</option>
+                                    @endfor
+                                </select>
+                            </div>
+                            <div class="col-12 text-center text-muted mt-3">
+                                <small>Laporan akan merekap semua data pemesanan yang telah <b>Disetujui</b> atau <b>Selesai</b> pada periode yang dipilih.</small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer border-0 p-4 pt-0">
+                        <button type="submit" class="btn w-100 text-white fw-bold py-2" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
+                            <i class="fa-solid fa-print"></i> CETAK LAPORAN
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
 
 <script>

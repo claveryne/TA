@@ -171,7 +171,7 @@
         
         <div class="search-box">
             <i class="fa-solid fa-magnifying-glass"></i>
-            <input type="text" id="searchInput" placeholder="Cari ruangan..." value="{{ request('search') }}">
+            <input type="text" id="searchInput" placeholder="Cari..." value="{{ request('search') }}">
         </div>
     </div>
 

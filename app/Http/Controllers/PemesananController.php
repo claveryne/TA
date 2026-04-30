@@ -18,6 +18,7 @@ use App\Mail\AdminNotificationMail;
 use App\Mail\CustomerStatusMail;
 use Exception;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class PemesananController extends Controller
 {
@@ -153,19 +154,19 @@ class PemesananController extends Controller
         $totalStatusFasilitas = $fasTersedia + $fasTerpakai + $fasPemeliharaan;
 
         return view('admin.dashboard', compact(
-            'events', 
+            'events',
             'pemeliharaanEvents',
             'karyawanEvents',
-            'pesananBaruCount', 
-            'pesananBerjalanCount', 
-            'pesananBerjalanStats', 
-            'pesananSelesaiCount', 
-            'fasilitasNonElektronik', 
-            'fasilitasElektronik', 
+            'pesananBaruCount',
+            'pesananBerjalanCount',
+            'pesananBerjalanStats',
+            'pesananSelesaiCount',
+            'fasilitasNonElektronik',
+            'fasilitasElektronik',
             'totalJenisFasilitas',
-            'fasTersedia', 
-            'fasTerpakai', 
-            'fasPemeliharaan', 
+            'fasTersedia',
+            'fasTerpakai',
+            'fasPemeliharaan',
             'totalStatusFasilitas'
         ));
     }
@@ -248,9 +249,9 @@ class PemesananController extends Controller
                 'keterangan_pemesanan' => 'nullable|string'
             ]);
 
-            $mulai = \Carbon\Carbon::parse($request->tgl_mulai);
-            $selesai = \Carbon\Carbon::parse($request->tgl_selesai);
-            
+            $mulai = Carbon::parse($request->tgl_mulai);
+            $selesai = Carbon::parse($request->tgl_selesai);
+
             if ($selesai->lte($mulai)) {
                 throw new Exception('Waktu selesai harus lebih dari waktu mulai.');
             }
@@ -394,7 +395,7 @@ class PemesananController extends Controller
     {
         try {
             $pemesanan = Pemesanan::findOrFail($id);
-            
+
             $request->validate([
                 'nama_pemesan' => 'required|string|max:255',
                 'telp_pemesan' => 'required|string|max:15',
@@ -408,9 +409,9 @@ class PemesananController extends Controller
                 'keterangan_pemesanan' => 'nullable|string'
             ]);
 
-            $mulai = \Carbon\Carbon::parse($request->tgl_mulai);
-            $selesai = \Carbon\Carbon::parse($request->tgl_selesai);
-            
+            $mulai = Carbon::parse($request->tgl_mulai);
+            $selesai = Carbon::parse($request->tgl_selesai);
+
             if ($selesai->lte($mulai)) {
                 throw new Exception('Waktu selesai harus lebih dari waktu mulai.');
             }
@@ -504,7 +505,7 @@ class PemesananController extends Controller
             return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
-    
+
     public function history(Request $request)
     {
         $query = Pemesanan::with(['ruangan', 'detailF.fasilitas'])
@@ -571,5 +572,39 @@ class PemesananController extends Controller
 
         $pdf = Pdf::loadView('pdf.nota', compact('pemesanan'));
         return $pdf->stream('Nota_' . $pemesanan->no_nota . '.pdf');
+    }
+
+    public function cetakLaporan(Request $request)
+    {
+        $request->validate([
+            'bulan' => 'required',
+            'tahun' => 'required',
+        ]);
+
+        $bulan = $request->bulan;
+        $tahun = $request->tahun;
+
+        $pemesanan = Pemesanan::with(['ruangan', 'detailF.fasilitas'])
+            ->whereMonth('tgl_mulai', $bulan)
+            ->whereYear('tgl_mulai', $tahun)
+            ->whereIn('status_pemesanan', ['Disetujui', 'Selesai'])
+            ->get();
+
+        $mahacitta = $pemesanan->filter(function ($item) {
+            return $item->ruangan && stripos($item->ruangan->nama_ruangan, 'Mahacitta') !== false;
+        });
+
+        $vyria = $pemesanan->filter(function ($item) {
+            return $item->ruangan && stripos($item->ruangan->nama_ruangan, 'Vyria') !== false;
+        });
+
+        $villasita = $pemesanan->filter(function ($item) {
+            return $item->ruangan && stripos($item->ruangan->nama_ruangan, 'Villasita') !== false;
+        });
+
+        $bulanNama = Carbon::create()->month((int) $bulan)->translatedFormat('F');
+
+        $pdf = Pdf::loadView('pdf.pemesanan', compact('mahacitta', 'vyria', 'villasita', 'bulanNama', 'tahun'));
+        return $pdf->stream('Laporan_Pemesanan_' . $bulanNama . '_' . $tahun . '.pdf');
     }
 }

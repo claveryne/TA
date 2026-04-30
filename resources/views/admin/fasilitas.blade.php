@@ -220,7 +220,7 @@
 
             <div class="search-box ms-md-2">
                 <i class="fa-solid fa-magnifying-glass"></i>
-                <input type="text" id="searchInput" placeholder="Cari fasilitas..." value="{{ request('search') }}">
+                <input type="text" id="searchInput" placeholder="Cari..." value="{{ request('search') }}">
             </div>
         </div>
     </div>

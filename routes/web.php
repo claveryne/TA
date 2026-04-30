@@ -47,6 +47,7 @@ Route::middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function 
     Route::post('/fasilitas/edit/{id}', [FasilitasController::class, 'update'])->name('fasilitas.update');
     
     Route::get('/pemesanan', [PemesananController::class, 'index'])->name('pemesanan');
+    Route::post('/pemesanan/laporan', [PemesananController::class, 'cetakLaporan'])->name('pemesanan.laporan');
     Route::post('/pemesanan/{id}/status', [PemesananController::class, 'updateStatus'])->name('pemesanan.status');
     Route::post('/pemesanan/{id}/edit', [PemesananController::class, 'edit'])->name('pemesanan.edit');
 
