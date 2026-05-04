@@ -464,6 +464,17 @@
                                         <p class="fw-bold mb-0">{{ $item->jumlah_orang }}</p>
                                     </div>
 
+                                    @if($item->bukti_pemesanan)
+                                    <div class="col-md-6 mb-3">
+                                        <label class="text-muted small">Bukti Pemesanan</label>
+                                        <p class="fw-bold mb-0">
+                                            <a href="{{ asset('uploads/bukti/' . $item->bukti_pemesanan) }}" target="_blank" class="text-decoration-none text-primary">
+                                                <i class="fas fa-image me-1"></i> Lihat Bukti
+                                            </a>
+                                        </p>
+                                    </div>
+                                    @endif
+
                                     @if($item->keterangan_pemesanan)
                                     <div class="col-md-12 mb-3">
                                         <label class="text-muted small">Keterangan Khusus</label>
@@ -503,6 +514,8 @@
                                         <input type="hidden" name="action" value="selesai">
                                         <button type="submit" class="btn btn-primary">Selesaikan Pesanan</button>
                                     </form>
+                                @elseif(strtolower($item->status_pemesanan) == 'selesai')
+                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id_pemesanan }}" data-bs-dismiss="modal">Ubah Detail</button>
                                 @endif
                             </div>
                         </div>
@@ -517,7 +530,7 @@
                                 <h5 class="modal-title w-100 text-center fw-bold" style="font-size: 1.5rem;">Ubah Detail Pemesanan</h5>
                                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                             </div>
-                            <form action="{{ route('pemesanan.edit', $item->id_pemesanan) }}" method="POST" class="form-edit">
+                            <form action="{{ route('pemesanan.edit', $item->id_pemesanan) }}" method="POST" class="form-edit" enctype="multipart/form-data">
                                 @csrf
                                 <div class="modal-body p-4" style="background-color: #ffffff;">
                                     <div class="row g-3">
@@ -537,9 +550,16 @@
                                             <label class="form-label text-muted small">Alamat Lengkap <span class="text-danger">*</span></label>
                                             <input type="text" name="alamat_pemesan" class="form-control" value="{{ $item->alamat_pemesan }}" required>
                                         </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <label class="form-label text-muted small">Instansi - Acara <span class="text-danger">*</span></label>
                                             <input type="text" name="nama_acara" class="form-control" value="{{ $item->nama_acara }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Bukti Pemesanan</label>
+                                            <input type="file" name="bukti_pemesanan" class="form-control" accept="image/*">
+                                            @if($item->bukti_pemesanan)
+                                                <small class="text-muted d-block mt-1">Saat ini: <a href="{{ asset('uploads/bukti/' . $item->bukti_pemesanan) }}" target="_blank">Lihat Bukti</a></small>
+                                            @endif
                                         </div>
                                         <div class="col-md-4">
                                             <label class="form-label text-muted small">Jumlah Orang <span class="text-danger">*</span></label>

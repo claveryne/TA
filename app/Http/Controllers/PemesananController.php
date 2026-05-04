@@ -406,7 +406,8 @@ class PemesananController extends Controller
                 'tgl_mulai' => 'required|date',
                 'tgl_selesai' => 'required|date|after:tgl_mulai',
                 'id_ruangan' => 'nullable|integer',
-                'keterangan_pemesanan' => 'nullable|string'
+                'keterangan_pemesanan' => 'nullable|string',
+                'bukti_pemesanan' => 'nullable|image|mimes:jpg,jpeg,png|max:10240'
             ]);
 
             $mulai = Carbon::parse($request->tgl_mulai);
@@ -463,6 +464,13 @@ class PemesananController extends Controller
                 }
             }
 
+            $fileName = $pemesanan->bukti_pemesanan;
+            if ($request->hasFile('bukti_pemesanan')) {
+                $file = $request->file('bukti_pemesanan');
+                $fileName = 'bukti_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('uploads/bukti'), $fileName);
+            }
+
             // 3. Update Data Pemesanan
             $pemesanan->update([
                 'nama_pemesan' => $request->nama_pemesan,
@@ -475,6 +483,7 @@ class PemesananController extends Controller
                 'tgl_selesai' => $request->tgl_selesai,
                 'keterangan_pemesanan' => $request->keterangan_pemesanan,
                 'id_ruangan' => $request->id_ruangan,
+                'bukti_pemesanan' => $fileName,
             ]);
 
             // 4. Update Detail Fasilitas (Delete insert)
