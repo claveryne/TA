@@ -440,7 +440,7 @@
 <!-- Video Tour Virtual -->
 <section id="tour" class="section-padding video-tour-section">
     <div class="container">
-        <h2 class="section-title">Video Tour Virtual</h2>
+        <h2 class="section-title">Video Tur Virtual</h2>
         <p class="section-subtitle">Menampilkan seluruh area gedung, ruangan, fasilitas, dan dokumentasi dari berbagai acara.</p>
         
         <div class="video-container">
