@@ -587,7 +587,7 @@
             <!-- Item 1 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 11.27.51 (1)-Photoroom.jpeg') }}" alt="Infocus" class="fasilitas-img">
+                    <img src="{{ asset('images/WhatsApp Image 2024-06-02 at 19.26.57.jpg') }}" alt="Stage Lighting" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Stage Lighting</h5>
                         <p>Pencahayaan memukau yang dapat disesuaikan untuk menciptakan atmosfer terbaik sesuai tema.</p>
@@ -607,7 +607,7 @@
             <!-- Item 3 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-13 at 01.06.32.jpeg') }}" alt="Gitar" class="fasilitas-img">
+                    <img src="{{ asset('images/WhatsApp Image 2024-05-13 at 01.06.32.jpeg') }}" alt="Alat Musik" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Alat Musik</h5>
                         <p>Instrument lengkap seperti gitar, bass, keyboard, piano, dan drum untuk live band.</p>
@@ -617,7 +617,7 @@
             <!-- Item 4 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 14.31.08.jpeg') }}" alt="Mic" class="fasilitas-img">
+                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 14.31.08.jpeg') }}" alt="Multimedia" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Multimedia</h5>
                         <p>Fasilitas lengkap seperti proyektor dan videotron resolusi tinggi disertai ruang operator untuk memastikan tampilan visual acara yang maksimal.</p>
@@ -627,7 +627,7 @@
             <!-- Item 5 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 11.27.48.jpeg') }}" alt="Lighting" class="fasilitas-img">
+                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 11.27.48.jpeg') }}" alt="Umum" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Umum</h5>
                         <p>Fasilitas penunjang kenyamanan tamu meliputi lift pengunjung, meja dan kursi yang beragam, area parkir kendaraan yang luas, serta toilet yang terawat.</p>
