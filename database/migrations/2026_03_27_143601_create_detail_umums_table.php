@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('detail_umums', function (Blueprint $table) {
             $table->bigIncrements('id_detailU');
             $table->string('warnaU', 255);
-            $table->integer('ukuranU');
+            $table->double('ukuranU');
             $table->timestamps();
 
             $table->unsignedBigInteger('id_fasilitas');

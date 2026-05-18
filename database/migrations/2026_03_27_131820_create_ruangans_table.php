@@ -15,7 +15,7 @@ return new class extends Migration
             $table->bigIncrements('id_ruangan');
             $table->string('nama_ruangan', 20);
             $table->string('jenis_ruangan', 20);
-            $table->integer('ukuran_ruangan');
+            $table->double('ukuran_ruangan');
             $table->integer('kapasitas_ruangan');
             $table->string('foto_ruangan', 255)->nullable();
             $table->string('keterangan_ruangan', 255)->nullable();

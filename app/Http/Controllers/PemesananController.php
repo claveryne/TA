@@ -58,7 +58,30 @@ class PemesananController extends Controller
         return view('admin.pemesanan', compact('pemesanans', 'activeTab', 'ruangans', 'fasilitases'));
     }
 
-    public function calendar()
+    public function dashboard()
+    {
+        $events = $this->getBookingEvents();
+        $pesananBaruCount = Pemesanan::where('status_pemesanan', 'Menunggu')->count();
+        $pesananBerjalanCount = Pemesanan::where('status_pemesanan', 'Disetujui')->count();
+        $pesananBerjalanStats = $this->getPesananBerjalanStats();
+        $pemeliharaanEvents = $this->getPemeliharaanEvents();
+        $karyawanEvents = $this->getKaryawanEvents();
+        $pesananSelesaiCount = Pemesanan::where('status_pemesanan', 'Selesai')->count();
+
+        $fasilitasStats = $this->getFasilitasStats();
+
+        return view('admin.dashboard', array_merge([
+            'events' => $events,
+            'pemeliharaanEvents' => $pemeliharaanEvents,
+            'karyawanEvents' => $karyawanEvents,
+            'pesananBaruCount' => $pesananBaruCount,
+            'pesananBerjalanCount' => $pesananBerjalanCount,
+            'pesananBerjalanStats' => $pesananBerjalanStats,
+            'pesananSelesaiCount' => $pesananSelesaiCount,
+        ], $fasilitasStats));
+    }
+
+    private function getBookingEvents()
     {
         $roomColors = [
             1 => '#F5CCA0',
@@ -66,12 +89,11 @@ class PemesananController extends Controller
             3 => '#6B240D',
         ];
 
-        $events = Pemesanan::with('ruangan')
+        return Pemesanan::with('ruangan')
             ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
             ->get()
             ->map(function ($booking) use ($roomColors) {
-                $title = $booking->ruangan->nama_ruangan . ": Booked";
-
+                $title = $booking->ruangan ? $booking->ruangan->nama_ruangan . ": Booked" : "Fasilitas: Booked";
                 $color = $roomColors[$booking->id_ruangan] ?? '#6B240D';
 
                 return [
@@ -82,12 +104,10 @@ class PemesananController extends Controller
                     'allDay' => false
                 ];
             });
+    }
 
-        // 1. Pesanan Baru
-        $pesananBaruCount = Pemesanan::where('status_pemesanan', 'Menunggu')->count();
-
-        // 2. Pesanan Berjalan (Disetujui) grouped by name (show 0 if no booking)
-        $pesananBerjalanCount = Pemesanan::where('status_pemesanan', 'Disetujui')->count();
+    private function getPesananBerjalanStats()
+    {
         $ruangansList = Ruangan::orderBy('id_ruangan')->get();
         $pesananBerjalanStats = collect();
         foreach ($ruangansList as $r) {
@@ -99,8 +119,12 @@ class PemesananController extends Controller
             $pesananBerjalanStats['Fasilitas'] = $countFasilitas;
         }
 
-        // Calendar Events - Pemeliharaan
-        $pemeliharaanEvents = Pemeliharaan::where('status_pemeliharaan', 'Berjalan')
+        return $pesananBerjalanStats;
+    }
+
+    private function getPemeliharaanEvents()
+    {
+        return Pemeliharaan::where('status_pemeliharaan', 'Berjalan')
             ->get()
             ->map(function ($p) {
                 return [
@@ -112,8 +136,10 @@ class PemesananController extends Controller
                     'allDay' => true
                 ];
             });
+    }
 
-        // Calendar Events - Karyawan
+    private function getKaryawanEvents()
+    {
         $jadwalKaryawans = \App\Models\JadwalKaryawan::with('user')->get();
         $karyawanEvents = collect();
         $daysMap = ['Minggu' => 0, 'Senin' => 1, 'Selasa' => 2, 'Rabu' => 3, 'Kamis' => 4, 'Jumat' => 5, 'Sabtu' => 6];
@@ -139,65 +165,68 @@ class PemesananController extends Controller
             }
         }
 
-        // 3. Pesanan Selesai
-        $pesananSelesaiCount = Pemesanan::where('status_pemesanan', 'Selesai')->count();
+        return $karyawanEvents;
+    }
 
-        // 4. Jenis Fasilitas
-        $fasilitasNonElektronik = Fasilitas::whereIn('jenis_fasilitas', ['Umum', 'Ruangan'])->count();
-        $fasilitasElektronik = Fasilitas::whereNotIn('jenis_fasilitas', ['Umum', 'Ruangan'])->count();
+    private function getFasilitasStats()
+    {
+        $fasilitasNonElektronik = Fasilitas::whereIn('jenis_fasilitas', ['Umum', 'Ruangan'])->sum('jumlah_fasilitas');
+        $fasilitasElektronik = Fasilitas::whereNotIn('jenis_fasilitas', ['Umum', 'Ruangan'])->sum('jumlah_fasilitas');
         $totalJenisFasilitas = $fasilitasNonElektronik + $fasilitasElektronik;
 
-        // 5. Status Fasilitas
-        $fasTersedia = Fasilitas::where('status_fasilitas', 'Tersedia')->count();
-        $fasTerpakai = Fasilitas::where('status_fasilitas', 'Terpakai')->count();
-        $fasPemeliharaan = Fasilitas::where('status_fasilitas', 'Pemeliharaan')->count();
+        $totalFasilitas = Fasilitas::sum('jumlah_fasilitas');
+
+        $fasPemeliharaan = Pemeliharaan::where('status_pemeliharaan', 'Berjalan')->get()->map(function ($p) {
+            return max(1, (int) $p->jumlah_pemeliharaan);
+        })->sum();
+
+        $fasTerpakai = DetailFasilitas::whereHas('pemesanan', function ($query) {
+            $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                ->where('tgl_mulai', '<=', now())
+                ->where('tgl_selesai', '>=', now());
+        })->sum('jumlah_fasilitas');
+
+        $ruanganTerpakai = Pemesanan::whereNotNull('id_ruangan')
+            ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+            ->where('tgl_mulai', '<=', now())
+            ->where('tgl_selesai', '>=', now())
+            ->count();
+
+        $fasTerpakai += $ruanganTerpakai;
+
+        $fasTersedia = max(0, $totalFasilitas - $fasPemeliharaan - $fasTerpakai);
+
         $totalStatusFasilitas = $fasTersedia + $fasTerpakai + $fasPemeliharaan;
 
-        return view('admin.dashboard', compact(
-            'events',
-            'pemeliharaanEvents',
-            'karyawanEvents',
-            'pesananBaruCount',
-            'pesananBerjalanCount',
-            'pesananBerjalanStats',
-            'pesananSelesaiCount',
-            'fasilitasNonElektronik',
-            'fasilitasElektronik',
-            'totalJenisFasilitas',
-            'fasTersedia',
-            'fasTerpakai',
-            'fasPemeliharaan',
-            'totalStatusFasilitas'
-        ));
+        return [
+            'fasilitasNonElektronik' => $fasilitasNonElektronik,
+            'fasilitasElektronik' => $fasilitasElektronik,
+            'totalJenisFasilitas' => $totalJenisFasilitas,
+            'fasTersedia' => $fasTersedia,
+            'fasTerpakai' => $fasTerpakai,
+            'fasPemeliharaan' => $fasPemeliharaan,
+            'totalStatusFasilitas' => $totalStatusFasilitas,
+        ];
+    }
+
+    private function getAvailableFasilitas()
+    {
+        return Fasilitas::where('status_fasilitas', 'Tersedia')->get()->map(function ($f) {
+            $activePemeliharaan = Pemeliharaan::where('nama_pemeliharaan', 'Fasilitas - ' . $f->nama_fasilitas)
+                ->where('status_pemeliharaan', 'Berjalan')
+                ->sum('jumlah_pemeliharaan');
+            $f->jumlah_fasilitas -= $activePemeliharaan;
+            return $f;
+        })->filter(function ($f) {
+            return $f->jumlah_fasilitas > 0;
+        })->groupBy('jenis_fasilitas');
     }
 
     public function home()
     {
         $ruangans = Ruangan::where('status_ruangan', 'Tersedia')->get();
-        $fasilitas = Fasilitas::where('status_fasilitas', 'Tersedia')->get()->groupBy('jenis_fasilitas');
-
-        $roomColors = [
-            1 => '#F5CCA0',
-            2 => '#994D1C',
-            3 => '#6B240D',
-        ];
-
-        $events = Pemesanan::with('ruangan')
-            ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-            ->get()
-            ->map(function ($booking) use ($roomColors) {
-                $title = $booking->ruangan->nama_ruangan . ": Booked";
-
-                $color = $roomColors[$booking->id_ruangan] ?? '#6B240D';
-
-                return [
-                    'title' => $title,
-                    'start' => $booking->tgl_mulai,
-                    'end' => $booking->tgl_selesai,
-                    'color' => $color,
-                    'allDay' => false
-                ];
-            });
+        $fasilitas = $this->getAvailableFasilitas();
+        $events = $this->getBookingEvents();
 
         return view('home', compact('ruangans', 'fasilitas', 'events'));
     }
@@ -205,30 +234,8 @@ class PemesananController extends Controller
     public function booking()
     {
         $ruangans = Ruangan::where('status_ruangan', 'Tersedia')->get();
-        $fasilitas = Fasilitas::where('status_fasilitas', 'Tersedia')->get()->groupBy('jenis_fasilitas');
-
-        $roomColors = [
-            1 => '#F5CCA0',
-            2 => '#994D1C',
-            3 => '#6B240D',
-        ];
-
-        $events = Pemesanan::with('ruangan')
-            ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-            ->get()
-            ->map(function ($booking) use ($roomColors) {
-                $title = $booking->ruangan->nama_ruangan . ": Booked";
-
-                $color = $roomColors[$booking->id_ruangan] ?? '#6B240D';
-
-                return [
-                    'title' => $title,
-                    'start' => $booking->tgl_mulai,
-                    'end' => $booking->tgl_selesai,
-                    'color' => $color,
-                    'allDay' => false
-                ];
-            });
+        $fasilitas = $this->getAvailableFasilitas();
+        $events = $this->getBookingEvents();
 
         return view('booking', compact('ruangans', 'fasilitas', 'events'));
     }
@@ -262,7 +269,7 @@ class PemesananController extends Controller
             Log::info('Mencoba menambahkan data pemesanan baru: ' . $request->nama_pemesan);
             DB::beginTransaction();
 
-            // 1. Pengecekan overlap untuk Ruangan
+            // cek bentrok ruangan
             if ($request->id_ruangan) {
                 $isRoomBooked = Pemesanan::where('id_ruangan', $request->id_ruangan)
                     ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak'])
@@ -276,7 +283,7 @@ class PemesananController extends Controller
                 }
             }
 
-            // 2. Pengecekan overlap untuk Fasilitas
+            // cek bentrok fasilitas
             if ($request->has('fasilitas')) {
                 foreach ($request->fasilitas as $fasilitas_id) {
                     if (is_numeric($fasilitas_id)) {
@@ -292,7 +299,11 @@ class PemesananController extends Controller
                                         ->where('tgl_selesai', '>', $request->tgl_mulai);
                                 })->sum('jumlah_fasilitas');
 
-                            $available_qty = $facility->jumlah_fasilitas - $used_qty;
+                            $active_maintenance = Pemeliharaan::where('nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas)
+                                ->where('status_pemeliharaan', 'Berjalan')
+                                ->sum('jumlah_pemeliharaan');
+
+                            $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
 
                             if ($requested_qty > $available_qty) {
                                 throw new Exception('Fasilitas ' . $facility->nama_fasilitas . ' tidak mencukupi. (Tersisa: ' . max(0, $available_qty) . ').');
@@ -302,7 +313,6 @@ class PemesananController extends Controller
                 }
             }
 
-            // 3. Simpan Data Pemesanan (Logika id_user digabung di sini)
             $pemesanan = Pemesanan::create([
                 'no_nota' => 'INV-' . strtoupper(Str::random(8)),
                 'nama_pemesan' => $request->nama_pemesan,
@@ -317,10 +327,9 @@ class PemesananController extends Controller
                 'status_pemesanan' => 'Menunggu',
                 'keterangan_pemesanan' => $request->keterangan_pemesanan,
                 'id_ruangan' => $request->id_ruangan,
-                'id_user' => auth()->check() ? auth()->id() : null, // Cek jika login pakai ID, jika tidak null
+                'id_user' => auth()->check() ? auth()->id() : null,
             ]);
 
-            // 4. Simpan Detail Fasilitas
             if ($request->has('fasilitas')) {
                 foreach ($request->fasilitas as $fasilitas_id) {
                     if (is_numeric($fasilitas_id)) {
@@ -422,7 +431,6 @@ class PemesananController extends Controller
 
             DB::beginTransaction();
 
-            // 1. Pengecekan overlap untuk Ruangan (Kecuali ID sendiri)
             if ($request->id_ruangan) {
                 $isRoomBooked = Pemesanan::where('id_ruangan', $request->id_ruangan)
                     ->where('id_pemesanan', '!=', $id)
@@ -437,7 +445,6 @@ class PemesananController extends Controller
                 }
             }
 
-            // 2. Pengecekan overlap untuk Fasilitas (Kecuali ID sendiri)
             if ($request->has('fasilitas')) {
                 foreach ($request->fasilitas as $fasilitas_id) {
                     if (is_numeric($fasilitas_id)) {
@@ -454,7 +461,11 @@ class PemesananController extends Controller
                                         ->where('tgl_selesai', '>', $request->tgl_mulai);
                                 })->sum('jumlah_fasilitas');
 
-                            $available_qty = $facility->jumlah_fasilitas - $used_qty;
+                            $active_maintenance = Pemeliharaan::where('nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas)
+                                ->where('status_pemeliharaan', 'Berjalan')
+                                ->sum('jumlah_pemeliharaan');
+
+                            $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
 
                             if ($requested_qty > $available_qty) {
                                 throw new Exception('Fasilitas ' . $facility->nama_fasilitas . ' tidak mencukupi. (Tersedia: ' . max(0, $available_qty) . ').');
@@ -471,7 +482,6 @@ class PemesananController extends Controller
                 $file->move(public_path('uploads/bukti'), $fileName);
             }
 
-            // 3. Update Data Pemesanan
             $pemesanan->update([
                 'nama_pemesan' => $request->nama_pemesan,
                 'telp_pemesan' => $request->telp_pemesan,
@@ -486,7 +496,6 @@ class PemesananController extends Controller
                 'bukti_pemesanan' => $fileName,
             ]);
 
-            // 4. Update Detail Fasilitas (Delete insert)
             DetailFasilitas::where('id_pemesanan', $id)->delete();
 
             if ($request->has('fasilitas')) {

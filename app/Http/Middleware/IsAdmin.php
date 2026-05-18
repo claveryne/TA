@@ -8,7 +8,7 @@ use Illuminate\Support\Facades\Auth;
 
 class IsAdmin
 {
-    // Membatasi akses khusus untuk user dengan role Admin
+    // membatasi akses khusus untuk user dengan role Admin
     public function handle(Request $request, Closure $next)
     {
         $user = Auth::user();

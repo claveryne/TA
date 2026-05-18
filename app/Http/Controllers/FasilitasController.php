@@ -27,14 +27,13 @@ class FasilitasController extends Controller
                 'keterangan_fasilitas' => 'nullable|max:255',
                 'status_fasilitas' => 'required|max:20',
 
-                // Detail fasilitas
                 'warnaMM' => 'nullable|string|max:255',
                 'warnaS' => 'nullable|string|max:255',
                 'warnaL' => 'nullable|string|max:255',
                 'warnaM' => 'nullable|string|max:255',
                 'warnaU' => 'nullable|string|max:255',
-                'ukuranU' => 'nullable|integer',
-                'ukuranR' => 'nullable|integer',
+                'ukuranU' => 'nullable|numeric',
+                'ukuranR' => 'nullable|numeric',
                 'kapasitasR' => 'nullable|integer',
             ]);
 
@@ -58,7 +57,6 @@ class FasilitasController extends Controller
                 'status_fasilitas' => $request->status_fasilitas,
             ]);
 
-            // Save detail based on jenis_fasilitas
             if ($request->jenis_fasilitas === 'Multimedia') {
                 DetailMulmed::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'warnaMM' => $request->warnaMM]);
             } elseif ($request->jenis_fasilitas === 'Sound System') {
@@ -148,7 +146,6 @@ class FasilitasController extends Controller
                 'status_fasilitas' => $request->status_fasilitas,
             ]);
 
-            // Hapus detail lama jika ada perubahan jenis
             if ($fasilitasOld->jenis_fasilitas !== $request->jenis_fasilitas) {
                 if ($fasilitasOld->jenis_fasilitas === 'Multimedia') {
                     DetailMulmed::where('id_fasilitas', $id)->delete();

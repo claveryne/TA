@@ -182,9 +182,10 @@
                 [
                     'name' => 'Mahacitta Hall',
                     'desc' => 'Ruang utama dengan fasilitas maksimal dan desain modern yang cocok untuk segala acara penuh makna. Dilengkapi dengan videotron, sound system, operator, dan lighting yang memukau.',
-                    'capacity' => '200-300 orang',
-                    'size' => '400 m²',
-                    'details' => ['Videotron Absen 4x3m', 'Sound System Yamaha DZR', 'Lighting DMX 512', 'AC Daikin 5 PK (4 Unit)', 'Kursi Futura'],
+                    'capacity' => '200-250 orang',
+                    'size' => '200 m²',
+                    'details' => ['Classroom', 'Boardroom', 'U-Shape', 'Theater'],
+                    'facility' => ['AC', 'Wifi', 'Kursi', 'Air Mineral', 'Proyektor', 'Kabel HDMI', 'Kabel VGA', 'Sound System (2 Mic)', 'Pensil', 'Notes', 'Parkir'],
                     'images' => [
                         'images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpeg', 
                         'images/WhatsApp Image 2024-05-08 at 2.19.54 PM.jpeg', 
@@ -194,9 +195,10 @@
                 [
                     'name' => 'Vyria',
                     'desc' => 'Ruangan berukuran sedang yang sangat pas untuk intimate gathering, workshop, atau meeting eksklusif dengan privasi tinggi.',
-                    'capacity' => '20-50 orang',
-                    'size' => '200 m²',
-                    'details' => ['Smart TV Samsung 65 Inch', 'Sound System Portable JBL', 'Whiteboard Kaca 2x1m', 'AC Panasonic 2 PK'],
+                    'capacity' => '11-30 orang',
+                    'size' => '32.5 m²',
+                    'details' => ['Classroom 24 orang', 'Boardroom 16 orang', 'U-Shape 11 orang', 'Theater 30 orang'],
+                    'facility' => ['AC', 'Wifi', 'Kursi', 'Air Mineral', 'Proyektor', 'Kabel HDMI', 'Kabel VGA', 'Sound System (2 Mic)', 'Pensil', 'Notes', 'Parkir'],
                     'images' => [
                         'images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg', 
                         'images/WhatsApp Image 2024-05-13 at 01.06.29 (2).jpeg', 
@@ -206,9 +208,10 @@
                 [
                     'name' => 'Villasita',
                     'desc' => 'Ruangan yang didesain khusus untuk aktivitas kreatif dan anak-anak. Nyaman, terang, dan dilengkapi fasilitas pendukung pembelajaran.',
-                    'capacity' => '20-50 orang',
-                    'size' => '200 m²',
-                    'details' => ['Proyektor Epson EB-X51', 'Screen 84 Inch', 'Kursi Anak Warna-warni', 'Sound System Standard'],
+                    'capacity' => '17-48 orang',
+                    'size' => '37.5 m²',
+                    'details' => ['Classroom 32 orang', 'Boardroom 20 orang', 'U-Shape 17 orang', 'Theater 48 orang'],
+                    'facility' => ['AC', 'Wifi', 'Kursi', 'Air Mineral', 'Proyektor', 'Kabel HDMI', 'Kabel VGA', 'Sound System (2 Mic)', 'Pensil', 'Notes', 'Parkir'],
                     'images' => [
                         'images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpeg', 
                         'images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpeg', 
@@ -246,55 +249,26 @@
             ];
 
             // --- DATA FASILITAS TAMBAHAN ---
-            $additional_facilities = [
-                [
-                    'name' => 'Multimedia',
-                    'items' => [
-                        ['label' => 'Videotron Absen 4x3m', 'img' => 'images/foto terbaru 1.jpeg'],
-                        ['label' => 'Proyektor Epson EB-X51', 'img' => 'images/moonbot.jpeg'],
-                        ['label' => 'Komputer Operator', 'img' => 'images/WhatsApp Image 2024-05-12 at 14.31.08.jpeg']
-                    ]
-                ],
-                [
-                    'name' => 'Sound System',
-                    'items' => [
-                        ['label' => 'Sound System Yamaha DZR', 'img' => 'images/WhatsApp Image 2024-05-12 at 14.31.10.jpeg'],
-                        ['label' => 'Mic Wireless & Kabel', 'img' => 'images/WhatsApp Image 2024-05-12 at 14.31.06.jpeg'],
-                        ['label' => 'Sound Portable', 'img' => 'images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpeg']
-                    ]
-                ],
-                [
-                    'name' => 'Stage Lighting',
-                    'items' => [
-                        ['label' => 'Lighting DMX 512', 'img' => 'images/WhatsApp Image 2024-06-02 at 19.26.56.jpeg'],
-                        ['label' => 'Follow Spot', 'img' => 'images/WhatsApp Image 2024-06-02 at 19.26.57.jpeg'],
-                        ['label' => 'Moving Head', 'img' => 'images/WhatsApp Image 2024-06-02 at 19.26.56 (1).jpeg']
-                    ]
-                ],
-                [
-                    'name' => 'Alat Musik',
-                    'items' => [
-                        ['label' => 'Keyboard Yamaha', 'img' => 'images/WhatsApp Image 2024-05-13 at 01.06.31 (1).jpeg'],
-                        ['label' => 'Drum Digital Roland', 'img' => 'images/WhatsApp Image 2024-05-13 at 01.06.32.jpeg'],
-                        ['label' => 'Gitar & Bass Yamaha', 'img' => 'images/WhatsApp Image 2024-06-02 at 19.26.57 (1).jpeg']
-                    ]
-                ],
-                [
-                    'name' => 'Meja & Kursi',
-                    'items' => [
-                        ['label' => 'Kursi Futura', 'img' => 'images/WhatsApp Image 2024-05-13 at 01.06.29 (2).jpeg'],
-                        ['label' => 'Meja Bulat', 'img' => 'images/IMG_9870.JPG'],
-                        ['label' => 'Cover & Pita Kursi', 'img' => 'images/IMG_0013.JPG']
-                    ]
-                ],
-                [
-                    'name' => 'Ruangan Tambahan',
-                    'items' => [
-                        ['label' => 'Vyria', 'img' => 'images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg'],
-                        ['label' => 'Villasita', 'img' => 'images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpeg']
-                    ]
-                ]
-            ];
+            $db_fasilitas = \App\Models\Fasilitas::all()->groupBy('jenis_fasilitas');
+            
+            $additional_facilities = [];
+            $order = ['Multimedia', 'Sound System', 'Lighting', 'Alat Musik', 'Umum', 'Ruangan'];
+            
+            foreach($order as $jenis) {
+                if(isset($db_fasilitas[$jenis]) && $db_fasilitas[$jenis]->count() > 0) {
+                    $items = [];
+                    foreach($db_fasilitas[$jenis] as $f) {
+                        $items[] = [
+                            'label' => $f->nama_fasilitas,
+                            'img' => $f->foto_fasilitas ? 'uploads/fasilitas/' . $f->foto_fasilitas : 'images/crop.jpg'
+                        ];
+                    }
+                    $additional_facilities[] = [
+                        'name' => $jenis,
+                        'items' => $items
+                    ];
+                }
+            }
         @endphp
 
         @foreach($rooms as $room)
@@ -310,7 +284,20 @@
 
                 <div class="mb-4">
                     @foreach($room['details'] as $detail)
-                        <span class="facility-badge">{{ $detail }}</span>
+                        @php
+                            $layoutName = strtolower(explode(' ', trim($detail))[0]); 
+                            $layoutImg = asset('images/layout-' . $layoutName . '.png');
+                        @endphp
+                        <button type="button" class="add-facility-badge me-1" 
+                                onclick="showLayoutModal('{{ $detail }}', '{{ $layoutImg }}')">
+                            <i class="fa-solid fa-border-all me-1"></i>{{ $detail }}
+                        </button>
+                    @endforeach
+                </div>
+
+                <div class="mb-1">
+                    @foreach($room['facility'] as $facility)
+                        <span class="facility-badge">{{ $facility }}</span>
                     @endforeach
                 </div>
             </div>
@@ -347,10 +334,10 @@
 
         <hr class="section-divider">
 
-            <div class="text-center mb-5">
-                <h3 class="room-title">Fasilitas Tambahan</h3>
-                <p class="room-desc">Fasilitas tambahan juga disediakan untuk melengkapi segala kebutuhan acara Anda.</p>
-            </div>
+        <div class="text-center mb-5">
+            <h3 class="room-title">Fasilitas Tambahan</h3>
+            <p class="room-desc">Fasilitas tambahan juga disediakan untuk melengkapi segala kebutuhan acara Anda.</p>
+        </div>
 
         <div class="row g-4 mb-5">
             @foreach($additional_facilities as $cardIndex => $facility)
@@ -385,6 +372,22 @@
 
     </div>
 </section>
+
+<!-- Layout Modal -->
+<div class="modal fade" id="layoutModal" tabindex="-1" aria-labelledby="layoutModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title" id="layoutModalLabel" style="color: var(--color-primary); font-weight: 700;">Layout Detail</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body text-center pt-2">
+        <p id="layoutModalDesc" class="text-muted mb-3" style="font-size: 0.95rem;"></p>
+        <img src="" id="layoutModalImg" class="img-fluid rounded shadow-sm w-100" alt="Layout Image" onerror="this.src='{{ asset('images/crop.jpg') }}'">
+      </div>
+    </div>
+  </div>
+</div>
 @endsection
 
 <script>
@@ -414,5 +417,14 @@
 
         // Tambahkan class 'active' HANYA ke badge yang baru saja diklik
         buttonElement.classList.add('active');
+    }
+
+    function showLayoutModal(title, imgSrc) {
+        document.getElementById('layoutModalLabel').innerText = 'Layout: ' + title;
+        document.getElementById('layoutModalDesc').innerText = 'Ilustrasi untuk tata letak ' + title + '.';
+        document.getElementById('layoutModalImg').src = imgSrc;
+        
+        var layoutModal = new bootstrap.Modal(document.getElementById('layoutModal'));
+        layoutModal.show();
     }
 </script>

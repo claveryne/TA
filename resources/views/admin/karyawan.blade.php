@@ -186,7 +186,6 @@
             <thead>
                 <tr>
                     <th width="5%">No</th>
-                    <th width="10%">Foto</th>
                     <th width="20%">Nama Karyawan</th>
                     <th width="15%">Email</th>
                     <th width="15%">Telepon</th>
@@ -198,23 +197,6 @@
                 @forelse($karyawan->sortByDesc('updated_at') as $index => $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>
-                            @if($item->avatar)
-                                @if(filter_var($item->avatar, FILTER_VALIDATE_URL))
-                                    <img src="{{ $item->avatar }}" 
-                                        alt="{{ $item->name }}" 
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                @else
-                                    <img src="{{ asset('uploads/user/' . $item->avatar) }}" 
-                                        alt="{{ $item->name }}" 
-                                        style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                                @endif
-                            @else
-                                <img src="https://ui-avatars.com/api/?name={{ urlencode($item->name) }}&background=random&color=fff&size=120"
-                                    alt="Default Avatar" class="rounded-circle shadow-sm"
-                                    style="width: 50px; height: 50px; object-fit: cover; border-radius: 50%;">
-                            @endif
-                        </td>
                         <td style="font-weight: 600; color: #612713;">{{ $item->name }}</td>
                         <td>{{ $item->email }}</td>
                         <td>{{ $item->phone }}</td>
@@ -341,7 +323,7 @@
                             <input type="email" name="email" class="form-control custom-input" required>
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-600">Foto</label>
+                            <label class="form-label fw-600">Foto <a href="javascript:void(0)" id="linkPreviewFotoKaryawan" class="text-secondary text-decoration-underline ms-2" style="font-size: 0.85rem; display: none;">Lihat Foto</a></label>
                             <input type="file" name="avatar" class="form-control custom-input" accept="image/*">
                         </div>
                         <div class="col-md-6">
@@ -769,6 +751,28 @@
             modalEditKaryawan.querySelector('input[name="phone"]').value = phone;
             modalEditKaryawan.querySelector('input[name="role"]').value = role;
             modalEditKaryawan.querySelector('textarea[name="address"]').value = address;
+            
+            var avatar = button.getAttribute('data-avatar');
+            var previewLink = modalEditKaryawan.querySelector('#linkPreviewFotoKaryawan');
+            
+            if (avatar) {
+                var photoUrl = avatar.startsWith('http') ? avatar : "{{ asset('uploads/user/') }}/" + avatar;
+                previewLink.style.display = 'inline-block';
+                previewLink.onclick = function() {
+                    Swal.fire({
+                        imageUrl: photoUrl,
+                        imageAlt: 'Preview Foto',
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        customClass: {
+                            image: 'img-fluid rounded'
+                        }
+                    });
+                };
+            } else {
+                previewLink.style.display = 'none';
+                previewLink.onclick = null;
+            }
         });
     });
 </script>

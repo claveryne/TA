@@ -334,7 +334,6 @@
 
             @foreach($pemesanans as $item)
                 @php
-                    // Mapping status to CSS class
                     $statusClass = 'status-menunggu';
                     $statusText = $item->status_pemesanan;
                     $statusLower = strtolower($statusText);
@@ -349,16 +348,18 @@
                         $statusClass = 'status-menunggu';
                     }
 
-                    // Image Source
-                    $imageSrc = asset('images/gambarLogo.png');
-                    if ($item->ruangan && $item->ruangan->foto_ruangan) {
-                        $imageSrc = asset('uploads/ruangan/' . $item->ruangan->foto_ruangan);
-                    }
-
-                    // Room Name
                     $roomName = $item->ruangan ? $item->ruangan->nama_ruangan : 'Pemesanan Fasilitas';
 
-                    // Dates
+                    if (stripos($roomName, 'Vyria') !== false) {
+                        $imageSrc = asset('images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg');
+                    } elseif (stripos($roomName, 'Mahacitta') !== false) {
+                        $imageSrc = asset('images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpeg');
+                    } elseif (stripos($roomName, 'Villasita') !== false) {
+                        $imageSrc = asset('images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpeg');
+                    } else {
+                        $imageSrc = asset('images/gambarLogo.png');
+                    }
+
                     $tglPesan = \Carbon\Carbon::parse($item->tgl_pesan)->translatedFormat('d F Y');
                     $tglMulai = \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d F Y, H:i');
                     $tglSelesai = \Carbon\Carbon::parse($item->tgl_selesai)->translatedFormat('d F Y, H:i');
@@ -561,19 +562,11 @@
                                                 <small class="text-muted d-block mt-1">Saat ini: <a href="{{ asset('uploads/bukti/' . $item->bukti_pemesanan) }}" target="_blank">Lihat Bukti</a></small>
                                             @endif
                                         </div>
-                                        <div class="col-md-4">
+                                        <div class="col-md-6">
                                             <label class="form-label text-muted small">Jumlah Orang <span class="text-danger">*</span></label>
                                             <input type="number" name="jumlah_orang" class="form-control" value="{{ $item->jumlah_orang }}" required>
                                         </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label text-muted small">Waktu Mulai <span class="text-danger">*</span></label>
-                                            <input type="datetime-local" name="tgl_mulai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_mulai)) }}" required>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label class="form-label text-muted small">Waktu Selesai <span class="text-danger">*</span></label>
-                                            <input type="datetime-local" name="tgl_selesai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_selesai)) }}" required>
-                                        </div>
-                                        <div class="col-md-12">
+                                        <div class="col-md-6">
                                             <label class="form-label text-muted small">Pilih Ruangan <span class="text-danger">*</span></label>
                                             <select name="id_ruangan" class="form-select" style="cursor: pointer;" required>
                                                 <option value="" selected disabled>Pilih opsi...</option>
@@ -583,6 +576,14 @@
                                                     </option>
                                                 @endforeach
                                             </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Waktu Mulai <span class="text-danger">*</span></label>
+                                            <input type="datetime-local" name="tgl_mulai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_mulai)) }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label text-muted small">Waktu Selesai <span class="text-danger">*</span></label>
+                                            <input type="datetime-local" name="tgl_selesai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_selesai)) }}" required>
                                         </div>
                                         <div class="col-12 mt-4">
                                             <label class="form-label text-muted fw-bold mb-3">Fasilitas Tambahan</label>

@@ -196,7 +196,7 @@
                     <div id="calendar" class="mx-auto" style="max-width: 1500px; background: #FDF9F5; padding: 20px; border-radius: 16px; color: #333; text-align: left;"></div>
                 </div>
             </div>
-
+    
             <!-- Bottom: Form Input -->
             <div class="col-12">
                 <div class="modern-booking-card">
@@ -286,7 +286,12 @@
                                                         <div class="form-check mb-1 d-flex align-items-center">
                                                             <div>
                                                                 <input class="form-check-input child-checkbox child-{{ $safe_jenis }}" name="fasilitas[]" type="checkbox" value="{{ $item->id_fasilitas }}" id="item_{{ $item->id_fasilitas }}" data-parent="#cat_{{ $safe_jenis }}">
-                                                                <label class="form-check-label text-muted" style="font-size: 0.85rem;" for="item_{{ $item->id_fasilitas }}">{{ $item->nama_fasilitas }}</label>
+                                                                <label class="form-check-label text-muted" style="font-size: 0.85rem;" for="item_{{ $item->id_fasilitas }}">
+                                                                    {{ $item->nama_fasilitas }}
+                                                                    @if($item->jumlah_fasilitas > 1)
+                                                                        <span style="font-size: 0.75rem; opacity: 0.8;">(Tersedia: {{ $item->jumlah_fasilitas }})</span>
+                                                                    @endif
+                                                                </label>
                                                             </div>
                                                             @if($item->jumlah_fasilitas > 1)
                                                                 <input type="number" name="qty_fasilitas[{{ $item->id_fasilitas }}]" class="form-control form-control-sm ms-auto" style="width: 70px; padding: 0.2rem 0.5rem; font-size: 0.8rem;" min="1" max="{{ $item->jumlah_fasilitas }}" placeholder="Jml" value="1">
@@ -306,10 +311,10 @@
                         </div>
 
                         <div class="mt-4 pt-4 d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 border-top" style="border-top-color: rgba(107,36,13,0.1) !important;">
-                            <p class="mb-0 text-muted" style="font-size: 0.85rem; max-width: 300px; line-height: 1.5;">
+                            <p class="mb-0 text-muted" style="font-size: 0.85rem; max-width: 500px; line-height: 1.5;">
                                 <i class="fa-solid fa-circle-info me-1" style="color: var(--color-primary);"></i> Mohon cek <strong>notifikasi email</strong> untuk update status booking Anda.
                             </p>
-                            <button type="submit" class="modern-btn mt-2 mt-md-0 w-100 w-md-auto">
+                            <button type="submit" class="modern-btn mt-2 mt-md-0 w-50 w-md-auto">
                                 Kirim Jadwal Booking
                             </button>
                         </div>

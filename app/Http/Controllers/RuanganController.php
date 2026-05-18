@@ -16,7 +16,7 @@ class RuanganController extends Controller
             $request->validate([
                 'nama_ruangan'      => 'required|max:20',
                 'jenis_ruangan'     => 'required|max:20',
-                'ukuran_ruangan'    => 'required|integer',
+                'ukuran_ruangan'    => 'required|numeric',
                 'kapasitas_ruangan' => 'required|integer',
                 'foto_ruangan'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'keterangan_ruangan'=> 'nullable|max:255',

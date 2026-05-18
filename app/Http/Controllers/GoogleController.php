@@ -20,12 +20,9 @@ class GoogleController extends Controller
     public function handleGoogleCallback()
     {
         try {
-            // pakai stateless() jika mengalami masalah session,
-            // untuk web normal bisa juga ->user() tanpa stateless()
             $googleUser = Socialite::driver('google')->user();
             $email = $googleUser->getEmail();
 
-            // Create atau update user
             $user = User::updateOrCreate(
                 ['email' => $email],
                 [

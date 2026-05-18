@@ -186,7 +186,6 @@
             <thead>
                 <tr>
                     <th width="5%">No</th>
-                    <th width="20%">Bukti Pemeliharaan</th>
                     <th width="20%">Nama Pemeliharaan</th>
                     <th width="10%">Jumlah</th>
                     <th width="15%">Biaya (Rp)</th>
@@ -198,15 +197,6 @@
                 @forelse($pemeliharaan->sortByDesc('updated_at') as $index => $item)
                     <tr>
                         <td>{{ $loop->iteration }}</td>
-                        <td>
-                            @if($item->foto_pemeliharaan)
-                                <img src="{{ asset('uploads/pemeliharaan/' . $item->foto_pemeliharaan) }}" 
-                                     alt="{{ $item->nama_pemeliharaan }}" 
-                                     style="width: 180px; height: 100px; object-fit: cover; border-radius: 8px;">
-                            @else
-                                <span style="color: #999;">No Image</span>
-                            @endif
-                        </td>
                         <td style="font-weight: 600; color: #612713;">{{ $item->nama_pemeliharaan }}</td>
                         <td>{{ $item->jumlah_pemeliharaan }}</td>
                         <td>{{ number_format($item->biaya_pemeliharaan, 0, ',', '.') }}</td>
@@ -225,7 +215,8 @@
                                     data-jumlah="{{ $item->jumlah_pemeliharaan }}"
                                     data-mulai="{{ $item->tglMulai_pemeliharaan }}"
                                     data-selesai="{{ $item->tglSelesai_pemeliharaan }}"
-                                    data-keterangan="{{ $item->keterangan_pemeliharaan }}">
+                                    data-keterangan="{{ $item->keterangan_pemeliharaan }}"
+                                    data-foto="{{ $item->bukti_pemeliharaan }}">
                                     <i class="fa-solid fa-pen-to-square"></i>
                                 </button>
                             </div>
@@ -310,7 +301,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Bukti Pemeliharaan</label>
-                            <input type="file" name="foto_pemeliharaan" class="form-control custom-input" accept="image/*">
+                            <input type="file" name="bukti_pemeliharaan" class="form-control custom-input" accept="image/*">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-600">Keterangan</label>
@@ -396,8 +387,8 @@
                             <input type="number" name="biaya_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 100000">
                         </div>
                         <div class="col-md-6">
-                            <label class="form-label fw-600">Bukti Pemeliharaan</label>
-                            <input type="file" name="foto_pemeliharaan" class="form-control custom-input" accept="image/*">
+                            <label class="form-label fw-600">Bukti Pemeliharaan <a href="javascript:void(0)" id="linkPreviewFotoPemeliharaan" class="text-secondary text-decoration-underline ms-2" style="font-size: 0.85rem; display: none;">Lihat Foto</a></label>
+                            <input type="file" name="bukti_pemeliharaan" class="form-control custom-input" accept="image/*">
                         </div>
                         <div class="col-12">
                             <label class="form-label fw-600">Keterangan</label>
@@ -568,6 +559,7 @@
             var tglMulai = button.getAttribute('data-mulai');
             var tglSelesai = button.getAttribute('data-selesai');
             var keterangan = button.getAttribute('data-keterangan');
+            var foto = button.getAttribute('data-foto');
             
             // Update URL action form
             var form = document.getElementById('formEditPemeliharaan');
@@ -583,6 +575,27 @@
             modalEditPemeliharaan.querySelector('input[name="tglMulai_pemeliharaan"]').value = tglMulai;
             modalEditPemeliharaan.querySelector('input[name="tglSelesai_pemeliharaan"]').value = tglSelesai;
             modalEditPemeliharaan.querySelector('textarea[name="keterangan_pemeliharaan"]').value = keterangan;
+            
+            var previewLink = modalEditPemeliharaan.querySelector('#linkPreviewFotoPemeliharaan');
+            
+            if (foto) {
+                var photoUrl = "{{ asset('uploads/pemeliharaan/') }}/" + foto;
+                previewLink.style.display = 'inline-block';
+                previewLink.onclick = function() {
+                    Swal.fire({
+                        imageUrl: photoUrl,
+                        imageAlt: 'Preview Foto',
+                        showCloseButton: true,
+                        showConfirmButton: false,
+                        customClass: {
+                            image: 'img-fluid rounded'
+                        }
+                    });
+                };
+            } else {
+                previewLink.style.display = 'none';
+                previewLink.onclick = null;
+            }
         });
     });
 </script>

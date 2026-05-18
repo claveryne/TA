@@ -36,7 +36,7 @@ Route::get('/booking', [PemesananController::class, 'booking'])->name('booking')
 Route::post('/booking/store', [PemesananController::class, 'store'])->name('booking.store');
 
 Route::middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function () {
-    Route::get('/dashboard', [PemesananController::class, 'calendar'])->name('dashboard');
+    Route::get('/dashboard', [PemesananController::class, 'dashboard'])->name('dashboard');
 
     Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan');
     Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');

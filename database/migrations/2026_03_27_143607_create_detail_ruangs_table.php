@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('detail_ruangs', function (Blueprint $table) {
             $table->bigIncrements('id_detailR');
-            $table->integer('ukuranR');
+            $table->double('ukuranR');
             $table->integer('kapasitasR');
             $table->timestamps();
 

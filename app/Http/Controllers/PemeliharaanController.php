@@ -72,15 +72,25 @@ class PemeliharaanController extends Controller
                 'tglSelesai_pemeliharaan'    => $request->tglSelesai_pemeliharaan,
             ]);
 
-            $statusUpdate = ($request->status_pemeliharaan == 'Berjalan') ? 'Pemeliharaan' : 'Tersedia';
-
             if (strpos($request->nama_pemeliharaan, 'Ruangan - ') === 0) {
+                $statusUpdate = ($request->status_pemeliharaan == 'Berjalan') ? 'Pemeliharaan' : 'Tersedia';
                 $nama_ruangan = substr($request->nama_pemeliharaan, 10);
                 Ruangan::where('nama_ruangan', $nama_ruangan)->update(['status_ruangan' => $statusUpdate]);
                 Fasilitas::where('nama_fasilitas', $nama_ruangan)->where('jenis_fasilitas', 'Ruangan')->update(['status_fasilitas' => $statusUpdate]);
             } else if (strpos($request->nama_pemeliharaan, 'Fasilitas - ') === 0) {
                 $nama_fasilitas = substr($request->nama_pemeliharaan, 12);
-                Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->update(['status_fasilitas' => $statusUpdate]);
+                $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->first();
+                if ($fasilitas) {
+                    $totalActive = Pemeliharaan::where('nama_pemeliharaan', $request->nama_pemeliharaan)
+                        ->where('status_pemeliharaan', 'Berjalan')
+                        ->sum('jumlah_pemeliharaan');
+                    
+                    if ($totalActive >= $fasilitas->jumlah_fasilitas) {
+                        $fasilitas->update(['status_fasilitas' => 'Pemeliharaan']);
+                    } else {
+                        $fasilitas->update(['status_fasilitas' => 'Tersedia']);
+                    }
+                }
             }
 
             Log::info('Data ruangan berhasil ditambahkan.', [
@@ -128,15 +138,25 @@ class PemeliharaanController extends Controller
                 'tglSelesai_pemeliharaan'    => $request->tglSelesai_pemeliharaan,
             ]);
 
-            $statusUpdate = ($request->status_pemeliharaan == 'Berjalan') ? 'Pemeliharaan' : 'Tersedia';
-
             if (strpos($request->nama_pemeliharaan, 'Ruangan - ') === 0) {
+                $statusUpdate = ($request->status_pemeliharaan == 'Berjalan') ? 'Pemeliharaan' : 'Tersedia';
                 $nama_ruangan = substr($request->nama_pemeliharaan, 10);
                 Ruangan::where('nama_ruangan', $nama_ruangan)->update(['status_ruangan' => $statusUpdate]);
                 Fasilitas::where('nama_fasilitas', $nama_ruangan)->where('jenis_fasilitas', 'Ruangan')->update(['status_fasilitas' => $statusUpdate]);
             } else if (strpos($request->nama_pemeliharaan, 'Fasilitas - ') === 0) {
                 $nama_fasilitas = substr($request->nama_pemeliharaan, 12);
-                Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->update(['status_fasilitas' => $statusUpdate]);
+                $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->first();
+                if ($fasilitas) {
+                    $totalActive = Pemeliharaan::where('nama_pemeliharaan', $request->nama_pemeliharaan)
+                        ->where('status_pemeliharaan', 'Berjalan')
+                        ->sum('jumlah_pemeliharaan');
+                    
+                    if ($totalActive >= $fasilitas->jumlah_fasilitas) {
+                        $fasilitas->update(['status_fasilitas' => 'Pemeliharaan']);
+                    } else {
+                        $fasilitas->update(['status_fasilitas' => 'Tersedia']);
+                    }
+                }
             }
 
             Log::info('Data pemeliharaan berhasil diupdate.', [

@@ -13,6 +13,7 @@ class PreventBackHistory
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
+    // setelah logout, tidak bisa akses halaman yang memerlukan login
     public function handle(Request $request, Closure $next): Response
     {
         $response = $next($request);

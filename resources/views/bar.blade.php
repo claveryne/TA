@@ -106,11 +106,13 @@
             transition: width 0.3s ease;
             border-radius: 2px;
         }
-        .navbar-nav .nav-link:hover {
+        .navbar-nav .nav-link:hover,
+        .navbar-nav .nav-link.active {
             color: var(--color-secondary) !important;
             background-color: rgba(255,255,255,0.05);
         }
-        .navbar-nav .nav-link:hover::after {
+        .navbar-nav .nav-link:hover::after,
+        .navbar-nav .nav-link.active::after {
             width: 60%;
         }
         .modern-btn-login {
@@ -130,6 +132,11 @@
             background-color: var(--color-light);
             color: var(--color-primary);
             transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(245, 204, 160, 0.3);
+        }
+        .modern-btn-login.active {
+            background-color: var(--color-light);
+            color: var(--color-primary);
             box-shadow: 0 6px 15px rgba(245, 204, 160, 0.3);
         }
         /* Mobile adjustment for navbar */
@@ -256,29 +263,29 @@
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('home') }}">Home</a>
+                        <a class="nav-link {{ request()->routeIs('home') ? 'active' : '' }}" href="{{ route('home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('gallery') }}">Gallery</a>
+                        <a class="nav-link {{ request()->routeIs('gallery') ? 'active' : '' }}" href="{{ route('gallery') }}">Gallery</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('facility') }}">Facility</a>
+                        <a class="nav-link {{ request()->routeIs('facility') ? 'active' : '' }}" href="{{ route('facility') }}">Facility</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ route('booking') }}">Booking</a>
+                        <a class="nav-link {{ request()->routeIs('booking') ? 'active' : '' }}" href="{{ route('booking') }}">Booking</a>
                     </li>
                     @if(Auth::check())
                         <li class="nav-item">
-                            <a class="nav-link" href="{{ route('history') }}">History</a>
+                            <a class="nav-link {{ request()->routeIs('history') ? 'active' : '' }}" href="{{ route('history') }}">History</a>
                         </li>
                         <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                            <a class="modern-btn-login" href="{{ route('profile') }}">
+                            <a class="modern-btn-login {{ request()->routeIs('profile') ? 'active' : '' }}" href="{{ route('profile') }}">
                                 <i class="fa-regular fa-user me-2"></i>Profile
                             </a>
                         </li>
                     @else
                         <li class="nav-item ms-lg-3 mt-3 mt-lg-0">
-                            <a class="modern-btn-login" href="{{ route('login') }}">
+                            <a class="modern-btn-login {{ request()->routeIs('login') ? 'active' : '' }}" href="{{ route('login') }}">
                                 <i class="fa-regular fa-user me-2"></i>Login
                             </a>
                         </li>
