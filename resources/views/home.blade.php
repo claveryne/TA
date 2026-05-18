@@ -90,32 +90,13 @@
         border-radius: 20px;
         overflow: hidden;
         box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        aspect-ratio: 16 / 9;
     }
-    .video-container img {
+    .video-container iframe {
         width: 100%;
+        height: 100%;
+        border: none;
         display: block;
-    }
-    .play-button {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        transform: translate(-50%, -50%);
-        width: 80px;
-        height: 80px;
-        background-color: rgba(255,255,255,0.8);
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 2rem;
-        color: var(--color-primary);
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-    .play-button:hover {
-        background-color: var(--color-secondary);
-        color: var(--color-light);
-        transform: translate(-50%, -50%) scale(1.1);
     }
 
     /* --- Galeri Foto --- */
@@ -444,15 +425,12 @@
         <p class="section-subtitle">Menampilkan seluruh area gedung, ruangan, fasilitas, dan dokumentasi dari berbagai acara.</p>
         
         <div class="video-container">
-            <!-- Video Element -->
-            <video id="videoLegacy" width="100%" poster="{{ asset('images/crop.jpg') }}">
-                <source src="{{ asset('videos/video legacy.mp4') }}" type="video/mp4">
-                Browser Anda tidak mendukung pemutar video.
-            </video>
-            <!-- Custom Play Button -->
-            <div class="play-button" onclick="let v = document.getElementById('videoLegacy'); v.play(); v.setAttribute('controls', 'controls'); this.style.display='none';">
-                <i class="fa-solid fa-play"></i>
-            </div>
+            <iframe
+                src="https://www.youtube.com/embed/08ZG68XLBAA?si=uwkoqp9MXk61oQut&rel=0"
+                title="Video Tur Virtual House of Legacy"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowfullscreen>
+            </iframe>
         </div>
     </div>
 </section>
