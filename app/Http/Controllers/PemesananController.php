@@ -259,6 +259,9 @@ class PemesananController extends Controller
             $mulai = Carbon::parse($request->tgl_mulai);
             $selesai = Carbon::parse($request->tgl_selesai);
 
+            if ($mulai->lt(now()->subMinutes(5))) {
+                throw new Exception('Waktu mulai tidak boleh kurang dari waktu sekarang.');
+            }
             if ($selesai->lte($mulai)) {
                 throw new Exception('Waktu selesai harus lebih dari waktu mulai.');
             }
@@ -422,6 +425,10 @@ class PemesananController extends Controller
             $mulai = Carbon::parse($request->tgl_mulai);
             $selesai = Carbon::parse($request->tgl_selesai);
 
+            $oldMulai = Carbon::parse($pemesanan->tgl_mulai);
+            if (!$oldMulai->eq($mulai) && $mulai->lt(now()->subMinutes(5))) {
+                throw new Exception('Waktu mulai tidak boleh kurang dari waktu sekarang.');
+            }
             if ($selesai->lte($mulai)) {
                 throw new Exception('Waktu selesai harus lebih dari waktu mulai.');
             }
