@@ -42,21 +42,21 @@
 
         @php
             $galleries = [
-                'images/foto terbaru 1.jpeg',
-                'images/foto terbaru 2.jpeg',
-                'images/WhatsApp Image 2024-06-02 at 19.26.56.jpeg',
-                'images/moonbot 2.jpeg',
-                'images/WhatsApp Image 2025-02-10 at 09.31.46.jpeg',
-                'images/IMG_9960.JPG',
-                'images/WhatsApp Image 2024-05-13 at 19.07.04.jpeg',
-                'images/WhatsApp Image 2024-06-02 at 19.26.57.jpeg',
-                'images/IMG_0018.JPG',
-                'images/IMG_0007.JPG',
-                'images/IMG_9859.JPG',
-                'images/moonbot3.jpeg',
-                'images/IMG_9934.JPG',
-                'images/IMG_0010.JPG',
-                'images/WhatsApp Image 2025-02-03 at 09.13.17.jpeg',
+                'images/foto terbaru 1.jpg',
+                'images/foto terbaru 2.jpg',
+                'images/WhatsApp Image 2024-06-02 at 19.26.56.jpg',
+                'images/moonbot 2.jpg',
+                'images/WhatsApp Image 2025-02-10 at 09.31.46.jpg',
+                'images/IMG_9960.jpg',
+                'images/WhatsApp Image 2024-05-13 at 19.07.04.jpg',
+                'images/WhatsApp Image 2024-06-02 at 19.26.57.jpg',
+                'images/IMG_0018.jpg',
+                'images/IMG_0007.jpg',
+                'images/IMG_9859.jpg',
+                'images/moonbot3.jpg',
+                'images/WhatsApp Image 2024-05-13 at 19.07.03.jpg',
+                'images/IMG_0010.jpg',
+                'images/WhatsApp Image 2025-02-03 at 09.13.17.jpg',
             ];
         @endphp
 
@@ -71,7 +71,7 @@
                 
                 <div class="col-12 {{ $colClass }}">
                     <div class="gallery-card">
-                        <img src="{{ asset($image) }}" alt="Gallery Image {{ $index + 1 }}">
+                        <img src="{{ asset_versioned($image) }}" alt="Gallery Image {{ $index + 1 }}">
                     </div>
                 </div>
             @endforeach

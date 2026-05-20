@@ -89,6 +89,10 @@ class RuanganController extends Controller
 
             $fileName = $ruanganOld->foto_ruangan;
             if ($request->hasFile('foto_ruangan')) {
+                if ($ruanganOld->foto_ruangan && file_exists(public_path('uploads/ruangan/' . $ruanganOld->foto_ruangan))) {
+                    @unlink(public_path('uploads/ruangan/' . $ruanganOld->foto_ruangan));
+                }
+
                 $file = $request->file('foto_ruangan');
                 $fileName = 'room_' . time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/ruangan'), $fileName);

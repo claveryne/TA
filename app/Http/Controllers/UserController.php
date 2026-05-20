@@ -26,6 +26,10 @@ class UserController extends Controller
 
             $fileName = $user->avatar;
             if ($request->hasFile('avatar')) {
+                if ($user->avatar && file_exists(public_path('uploads/user/' . $user->avatar))) {
+                    @unlink(public_path('uploads/user/' . $user->avatar));
+                }
+
                 $file = $request->file('avatar');
                 $fileName = 'user_' . time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/user'), $fileName);
@@ -135,14 +139,20 @@ class UserController extends Controller
         try {
             Log::info('Mencoba mengupdate data karyawan: ' . $request->name);
 
-            $fileName = null;
+            $userOld = User::find($id);
+
+            $fileName = $userOld->avatar;
             if ($request->hasFile('avatar')) {
+                if ($userOld->avatar && file_exists(public_path('uploads/user/' . $userOld->avatar))) {
+                    @unlink(public_path('uploads/user/' . $userOld->avatar));
+                }
+
                 $file = $request->file('avatar');
                 $fileName = 'user_' . time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/user'), $fileName);
             }
 
-            $user = User::where('id', $id)->update([
+            $updateData = [
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'phone'             => $request->phone,
@@ -150,8 +160,13 @@ class UserController extends Controller
                 'avatar'            => $fileName,
                 'role'              => $request->role,
                 'status'            => $request->status,
-                'password'          => $request->password ? bcrypt($request->password) : null,
-            ]);
+            ];
+
+            if ($request->password) {
+                $updateData['password'] = bcrypt($request->password);
+            }
+
+            $user = User::where('id', $id)->update($updateData);
 
             Log::info('Data karyawan berhasil diupdate.', [
                 'id'   => $id,
@@ -312,14 +327,20 @@ class UserController extends Controller
         try {
             Log::info('Mencoba mengupdate data pelanggan: ' . $request->name);
 
-            $fileName = null;
+            $userOld = User::find($id);
+
+            $fileName = $userOld->avatar;
             if ($request->hasFile('avatar')) {
+                if ($userOld->avatar && file_exists(public_path('uploads/user/' . $userOld->avatar))) {
+                    @unlink(public_path('uploads/user/' . $userOld->avatar));
+                }
+
                 $file = $request->file('avatar');
                 $fileName = 'user_' . time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/user'), $fileName);
             }
 
-            $user = User::where('id', $id)->update([
+            $updateData = [
                 'name'              => $request->name,
                 'email'             => $request->email,
                 'phone'             => $request->phone,
@@ -327,8 +348,13 @@ class UserController extends Controller
                 'avatar'            => $fileName,
                 'role'              => $request->role,
                 'status'            => $request->status,
-                'password'          => $request->password ? bcrypt($request->password) : null,
-            ]);
+            ];
+
+            if ($request->password) {
+                $updateData['password'] = bcrypt($request->password);
+            }
+
+            $user = User::where('id', $id)->update($updateData);
 
             Log::info('Data pelanggan berhasil diupdate.', [
                 'id'   => $id,

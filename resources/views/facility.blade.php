@@ -1,4 +1,4 @@
-﻿@extends('bar')
+@extends('bar')
 
 @section('title', 'Facility')
 
@@ -182,40 +182,40 @@
                 [
                     'name' => 'Mahacitta Hall',
                     'desc' => 'Ruang utama dengan fasilitas maksimal dan desain modern yang cocok untuk segala acara penuh makna. Dilengkapi dengan videotron, sound system, operator, dan lighting yang memukau.',
-                    'capacity' => '200-250 orang',
+                    'capacity' => '200 orang',
                     'size' => '200 m²',
                     'details' => ['Classroom', 'Boardroom', 'U-Shape', 'Theater'],
-                    'facility' => ['AC', 'Wifi', 'Kursi', 'Air Mineral', 'Proyektor', 'Kabel HDMI', 'Kabel VGA', 'Sound System (2 Mic)', 'Pensil', 'Notes', 'Parkir'],
+                    'facility' => ['AC', 'Wifi', 'Kursi', 'Panggung', 'Videotron', 'Alat Musik', 'Operator', 'Sound System', 'Mic', 'Ruang Transit', 'Parkir'],
                     'images' => [
-                        'images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpeg', 
-                        'images/WhatsApp Image 2024-05-08 at 2.19.54 PM.jpeg', 
-                        'images/WhatsApp Image 2024-05-12 at 11.27.51 (1)-Photoroom.jpeg'
+                        'images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpg',
+                        'images/IMG_0004.jpg',
+                        'images/WhatsApp Image 2024-05-08 at 2.19.54 PM.jpg',
                     ]
                 ],
                 [
                     'name' => 'Vyria',
                     'desc' => 'Ruangan berukuran sedang yang sangat pas untuk intimate gathering, workshop, atau meeting eksklusif dengan privasi tinggi.',
-                    'capacity' => '11-30 orang',
+                    'capacity' => '30 orang',
                     'size' => '32.5 m²',
                     'details' => ['Classroom 24 orang', 'Boardroom 16 orang', 'U-Shape 11 orang', 'Theater 30 orang'],
                     'facility' => ['AC', 'Wifi', 'Kursi', 'Air Mineral', 'Proyektor', 'Kabel HDMI', 'Kabel VGA', 'Sound System (2 Mic)', 'Pensil', 'Notes', 'Parkir'],
                     'images' => [
-                        'images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg', 
-                        'images/WhatsApp Image 2024-05-13 at 01.06.29 (2).jpeg', 
-                        'images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg'
+                        'images/WhatsApp Image 2024-05-13 at 01.06.29.jpg', 
+                        'images/WhatsApp Image 2024-05-13 at 01.06.29 (2).jpg', 
+                        'images/WhatsApp Image 2024-05-13 at 01.06.29.jpg'
                     ]
                 ],
                 [
                     'name' => 'Villasita',
                     'desc' => 'Ruangan yang didesain khusus untuk aktivitas kreatif dan anak-anak. Nyaman, terang, dan dilengkapi fasilitas pendukung pembelajaran.',
-                    'capacity' => '17-48 orang',
+                    'capacity' => '48 orang',
                     'size' => '37.5 m²',
                     'details' => ['Classroom 32 orang', 'Boardroom 20 orang', 'U-Shape 17 orang', 'Theater 48 orang'],
                     'facility' => ['AC', 'Wifi', 'Kursi', 'Air Mineral', 'Proyektor', 'Kabel HDMI', 'Kabel VGA', 'Sound System (2 Mic)', 'Pensil', 'Notes', 'Parkir'],
                     'images' => [
-                        'images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpeg', 
-                        'images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpeg', 
-                        'images/WhatsApp Image 2024-05-13 at 01.06.30.jpeg'
+                        'images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpg', 
+                        'images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpg', 
+                        'images/WhatsApp Image 2024-05-13 at 01.06.30.jpg'
                     ]
                 ],
             ];
@@ -224,27 +224,27 @@
             $general_facilities = [
                 [
                     'name' => 'Lahan Parkir Luas',
-                    'image' => 'images/crop.jpg'
+                    'image' => 'images/WhatsApp Image 2024-05-14 at 09.24.07_ce1b8bc3.jpg'
                 ],
                 [
                     'name' => 'High-Speed Wi-Fi',
-                    'image' => 'images/moonbot (1).jpeg'
+                    'image' => 'images/moonbot (1).jpg'
                 ],
                 [
                     'name' => 'Ruang VIP / Transit',
-                    'image' => 'images/IMG_9934.JPG'
+                    'image' => 'images/IMG_9934.jpg'
                 ],
                 [
                     'name' => 'Lift Pengunjung',
-                    'image' => 'images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg'
+                    'image' => 'images/WhatsApp Image 2024-05-13 at 01.06.29.jpg'
                 ],
                 [
                     'name' => 'Toilet Eksklusif',
-                    'image' => 'images/WhatsApp Image 2024-05-12 at 11.27.48.jpeg'
+                    'image' => 'images/WhatsApp Image 2024-05-12 at 11.27.48.jpg'
                 ],
                 [
                     'name' => 'Keamanan Terpadu',
-                    'image' => 'images/IMG_0013.JPG'
+                    'image' => 'images/WhatsApp Image 2024-05-13 at 16.28.31_da9bc775.jpg'
                 ]
             ];
 
@@ -258,8 +258,12 @@
                 if(isset($db_fasilitas[$jenis]) && $db_fasilitas[$jenis]->count() > 0) {
                     $items = [];
                     foreach($db_fasilitas[$jenis] as $f) {
+                        $label = $f->nama_fasilitas;
+                        if (!empty($f->merk_fasilitas) && trim($f->merk_fasilitas) !== '-') {
+                            $label .= ' ' . $f->merk_fasilitas;
+                        }
                         $items[] = [
-                            'label' => $f->nama_fasilitas,
+                            'label' => $label,
                             'img' => $f->foto_fasilitas ? 'uploads/fasilitas/' . $f->foto_fasilitas : 'images/crop.jpg'
                         ];
                     }
@@ -286,7 +290,7 @@
                     @foreach($room['details'] as $detail)
                         @php
                             $layoutName = strtolower(explode(' ', trim($detail))[0]); 
-                            $layoutImg = asset('images/layout-' . $layoutName . '.png');
+                            $layoutImg = asset_versioned('images/layout-' . $layoutName . '.png');
                         @endphp
                         <button type="button" class="add-facility-badge me-1" 
                                 onclick="showLayoutModal('{{ $detail }}', '{{ $layoutImg }}')">
@@ -305,7 +309,7 @@
             <div class="row g-4 room-gallery">
                 @foreach($room['images'] as $img)
                 <div class="col-md-4 col-sm-12">
-                    <img src="{{ asset($img) }}" alt="Foto {{ $room['name'] }}">
+                    <img src="{{ asset_versioned($img) }}" alt="Foto {{ $room['name'] }}">
                 </div>
                 @endforeach
             </div>
@@ -323,7 +327,7 @@
             @foreach($general_facilities as $facility)
             <div class="col-lg-4 col-md-6 col-12">
                 <div class="gen-facility-card">
-                    <img src="{{ asset($facility['image']) }}" alt="Foto {{ $facility['name'] }}">
+                    <img src="{{ asset_versioned($facility['image']) }}" alt="Foto {{ $facility['name'] }}">
                     <div class="gen-facility-card-body">
                       <h4 class="gen-facility-title">{{ $facility['name'] }}</h4>
                     </div>
@@ -344,10 +348,10 @@
             <div class="col-lg-4 col-md-6 col-12">
                 <div class="add-facility-card">
                     <div class="add-facility-img-container">
-                        <img src="{{ asset($facility['items'][0]['img']) }}" 
+                        <img src="{{ asset_versioned($facility['items'][0]['img']) }}" 
                              id="add-fac-img-{{ $cardIndex }}" 
                              class="add-facility-img" 
-                             alt="{{ $facility['name'] }}">
+                             alt="{{ $facility['items'][0]['label'] }}">
                     </div>
                     
                     <div class="add-facility-body">
@@ -358,7 +362,7 @@
                                 <button type="button" 
                                     class="add-facility-badge {{ $itemIndex == 0 ? 'active' : '' }}" 
                                     data-target-img="add-fac-img-{{ $cardIndex }}"
-                                    data-image-src="{{ asset($item['img']) }}"
+                                    data-image-src="{{ asset_versioned($item['img']) }}"
                                     onclick="changeFacilityImage(this)">
                                     {{ $item['label'] }}
                                 </button>
@@ -383,7 +387,7 @@
       </div>
       <div class="modal-body text-center pt-2">
         <p id="layoutModalDesc" class="text-muted mb-3" style="font-size: 0.95rem;"></p>
-        <img src="" id="layoutModalImg" class="img-fluid rounded shadow-sm w-100" alt="Layout Image" onerror="this.src='{{ asset('images/crop.jpg') }}'">
+        <img src="" id="layoutModalImg" class="img-fluid rounded shadow-sm w-100" alt="Layout Image" onerror="this.src='{{ asset_versioned('images/crop.jpg') }}'">
       </div>
     </div>
   </div>

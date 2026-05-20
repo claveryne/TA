@@ -7,7 +7,7 @@
     /* --- Hero Section --- */
     .hero-section {
         position: relative;
-        background: url('{{ asset("images/crop.jpg") }}') center/cover no-repeat;
+        background: url('{{ asset_versioned("images/crop.jpg") }}') center/cover no-repeat;
         height: 95vh;
         display: flex;
         align-items: center;
@@ -444,32 +444,32 @@
         <div class="row g-4">
             <div class="col-md-4 col-sm-6">
                 <div class="galeri-item">
-                    <img src="{{ asset('images/IMG_0018.JPG') }}" alt="Event 1">
+                    <img src="{{ asset_versioned('images/IMG_0018.jpg') }}" alt="Event 1">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="galeri-item">
-                    <img src="{{ asset('images/foto terbaru 2.jpeg') }}" alt="Event 2">
+                    <img src="{{ asset_versioned('images/foto terbaru 2.jpg') }}" alt="Event 2">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="galeri-item">
-                    <img src="{{ asset('images/WhatsApp Image 2025-05-23 at 09.11.26 (1).jpeg') }}" alt="Event 3">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2025-05-23 at 09.11.26 (1).jpg') }}" alt="Event 3">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="galeri-item">
-                    <img src="{{ asset('images/IMG_9960.JPG') }}" alt="Event 4">
+                    <img src="{{ asset_versioned('images/IMG_9960.jpg') }}" alt="Event 4">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="galeri-item">
-                    <img src="{{ asset('images/WhatsApp Image 2024-06-02 at 19.26.56.jpeg') }}" alt="Event 5">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-06-02 at 19.26.56.jpg') }}" alt="Event 5">
                 </div>
             </div>
             <div class="col-md-4 col-sm-6">
                 <div class="galeri-item">
-                    <img src="{{ asset('images/moonbot 2.jpeg') }}" alt="Event 6">
+                    <img src="{{ asset_versioned('images/moonbot 2.jpg') }}" alt="Event 6">
                 </div>
             </div>
         </div>
@@ -486,13 +486,13 @@
             <!-- Room 1 -->
             <div class="col-lg-4 col-md-6">
                 <div class="room-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg') }}" alt="Studio" class="room-image">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-13 at 01.06.29.jpg') }}" alt="Studio" class="room-image">
                     <div class="room-details">
                         <h3 class="room-title">Vyria</h3>
-                        <p class="room-desc">Ruang medium dengan desain simple dan modern yang cocok digunakan untuk meeting maupun ruang transit.</p>
+                        <p class="room-desc">Ruang medium dengan desain simple and modern yang cocok digunakan untuk meeting maupun ruang transit.</p>
                         <div class="d-flex align-items-center mb-3" style="color: var(--color-secondary);">
                             <i class="fa-solid fa-people-group me-2"></i>
-                            <span class="mb-0" style="font-weight: 500; padding-right: 30px;">11-30 orang</span>
+                            <span class="mb-0" style="font-weight: 500; padding-right: 30px;">30 orang</span>
                             <i class="fa-solid fa-ruler-combined me-2"></i>
                             <span class="mb-0" style="font-weight: 500;">32.5 m²</span>
                         </div>
@@ -516,13 +516,13 @@
             <!-- Room 2 -->
             <div class="col-lg-4 col-md-6">
                 <div class="room-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpeg') }}" alt="Auditorium" class="room-image">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpg') }}" alt="Auditorium" class="room-image">
                     <div class="room-details">
                         <h3 class="room-title">Mahacitta Hall</h3>
                         <p class="room-desc">Ruang utama dengan fasilitas maksimal dan desain modern yang cocok untuk segala acara penuh makna.</p>
                         <div class="d-flex align-items-center mb-3" style="color: var(--color-secondary);">
                             <i class="fa-solid fa-people-group me-2"></i>
-                            <span class="mb-0" style="font-weight: 500; padding-right: 30px;">200-250 orang</span>
+                            <span class="mb-0" style="font-weight: 500; padding-right: 30px;">200 orang</span>
                             <i class="fa-solid fa-ruler-combined me-2"></i>
                             <span class="mb-0" style="font-weight: 500;">200 m²</span>
                         </div>
@@ -547,13 +547,13 @@
             <!-- Room 3 -->
             <div class="col-lg-4 col-md-6">
                 <div class="room-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpeg') }}" alt="VIP Room" class="room-image">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpg') }}" alt="VIP Room" class="room-image">
                     <div class="room-details">
                         <h3 class="room-title">Villasita</h3>
                         <p class="room-desc">Ruang medium dengan desain simple dan modern yang cocok digunakan untuk meeting maupun ruang transit.</p>
                         <div class="d-flex align-items-center mb-3" style="color: var(--color-secondary);">
                             <i class="fa-solid fa-people-group me-2"></i>
-                            <span class="mb-0" style="font-weight: 500; padding-right: 30px;">17-48 orang</span>
+                            <span class="mb-0" style="font-weight: 500; padding-right: 30px;">48 orang</span>
                             <i class="fa-solid fa-ruler-combined me-2"></i>
                             <span class="mb-0" style="font-weight: 500;">37.5 m²</span>
                         </div>
@@ -587,7 +587,7 @@
             <!-- Item 1 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-06-02 at 19.26.57.jpg') }}" alt="Stage Lighting" class="fasilitas-img">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-06-02 at 19.26.57.jpg') }}" alt="Stage Lighting" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Stage Lighting</h5>
                         <p>Pencahayaan memukau yang dapat disesuaikan untuk menciptakan atmosfer terbaik sesuai tema.</p>
@@ -597,7 +597,7 @@
             <!-- Item 2 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 14.31.10 (1).jpeg') }}" alt="Sound System" class="fasilitas-img">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-12 at 14.31.10 (1).jpg') }}" alt="Sound System" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Sound & Mic</h5>
                         <p>Audio profesional dan jumlah mic yang cukup untuk mendukung kejelasan suara di seluruh ruangan.</p>
@@ -607,7 +607,7 @@
             <!-- Item 3 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-13 at 01.06.32.jpeg') }}" alt="Alat Musik" class="fasilitas-img">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-13 at 01.06.32.jpg') }}" alt="Alat Musik" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Alat Musik</h5>
                         <p>Instrument lengkap seperti gitar, bass, keyboard, piano, dan drum untuk live band.</p>
@@ -617,17 +617,17 @@
             <!-- Item 4 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 14.31.08.jpeg') }}" alt="Multimedia" class="fasilitas-img">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-12 at 14.31.08.jpg') }}" alt="Multimedia" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Multimedia</h5>
-                        <p>Fasilitas lengkap seperti proyektor dan videotron resolusi tinggi disertai ruang operator untuk memastikan tampilan visual acara yang maksimal.</p>
+                        <p>Fasilitas lengkap seperti proyektor and videotron resolusi tinggi disertai ruang operator untuk memastikan tampilan visual acara yang maksimal.</p>
                     </div>
                 </div>
             </div>
             <!-- Item 5 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-12 at 11.27.48.jpeg') }}" alt="Umum" class="fasilitas-img">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-12 at 11.27.48.jpg') }}" alt="Umum" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Umum</h5>
                         <p>Fasilitas penunjang kenyamanan tamu meliputi lift pengunjung, meja dan kursi yang beragam, area parkir kendaraan yang luas, serta toilet yang terawat.</p>
@@ -637,7 +637,7 @@
             <!-- Item 6 -->
             <div class="col-md-6">
                 <div class="fasilitas-card">
-                    <img src="{{ asset('images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpeg') }}" alt="Operator" class="fasilitas-img">
+                    <img src="{{ asset_versioned('images/WhatsApp Image 2024-05-13 at 01.06.29 (3).jpg') }}" alt="Operator" class="fasilitas-img">
                     <div class="fasilitas-info">
                         <h5>Ruangan</h5>
                         <p>Ruangan tambahan dengan desain elegan yang didukung dengan AC sentral bersuhu sejuk serta fleksibilitas tata letak meja dan kursi sesuai konsep acara.</p>

@@ -312,17 +312,15 @@
 
                                     <div class="history-body">
                                         <h4>{{ $roomName }}</h4>
-                                        <p><i class="fas fa-calendar-alt me-2" style="color: var(--color-primary); width: 20px;"></i> Tanggal: <strong>{{ $tglAcara }}</strong></p>
-                                        <p><i class="fas fa-info-circle me-2" style="color: var(--color-primary); width: 20px;"></i> Kegiatan: {{ $item->nama_acara }}</p>
-                                    </div>
-                                </div>
-
-                                <div class="history-footer">
-                                    <div class="total-price">
-                                        
-                                    </div>
-                                    <div>
-                                        <a href="#" class="btn-detail" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $item->id_pemesanan }}">Lihat Detail</a>
+                                        <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-start align-items-md-end mt-2">
+                                            <div class="detail-info">
+                                                <p class="mb-1"><i class="fas fa-calendar-alt me-2" style="color: var(--color-primary); width: 20px;"></i> Tanggal: <strong>{{ $tglAcara }}</strong></p>
+                                                <p class="mb-0"><i class="fas fa-info-circle me-2" style="color: var(--color-primary); width: 20px;"></i> Kegiatan: {{ $item->nama_acara }}</p>
+                                            </div>
+                                            <div class="mt-3 mt-md-0 align-self-end align-self-md-auto">
+                                                <a href="#" class="btn-detail" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $item->id_pemesanan }}">Lihat Detail</a>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 

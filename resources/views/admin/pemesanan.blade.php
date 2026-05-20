@@ -351,11 +351,11 @@
                     $roomName = $item->ruangan ? $item->ruangan->nama_ruangan : 'Pemesanan Fasilitas';
 
                     if (stripos($roomName, 'Vyria') !== false) {
-                        $imageSrc = asset('images/WhatsApp Image 2024-05-13 at 01.06.29.jpeg');
+                        $imageSrc = asset('images/WhatsApp Image 2024-05-13 at 01.06.29.jpg');
                     } elseif (stripos($roomName, 'Mahacitta') !== false) {
-                        $imageSrc = asset('images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpeg');
+                        $imageSrc = asset('images/WhatsApp Image 2024-05-08 at 2.19.54 PM(1).jpg');
                     } elseif (stripos($roomName, 'Villasita') !== false) {
-                        $imageSrc = asset('images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpeg');
+                        $imageSrc = asset('images/WhatsApp Image 2024-05-13 at 01.06.30 (1).jpg');
                     } else {
                         $imageSrc = asset('images/gambarLogo.png');
                     }

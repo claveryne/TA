@@ -131,6 +131,10 @@ class FasilitasController extends Controller
 
             $fileName = $fasilitasOld->foto_fasilitas;
             if ($request->hasFile('foto_fasilitas')) {
+                if ($fasilitasOld->foto_fasilitas && file_exists(public_path('uploads/fasilitas/' . $fasilitasOld->foto_fasilitas))) {
+                    @unlink(public_path('uploads/fasilitas/' . $fasilitasOld->foto_fasilitas));
+                }
+
                 $file = $request->file('foto_fasilitas');
                 $fileName = 'facility_' . time() . '.' . $file->getClientOriginalExtension();
                 $file->move(public_path('uploads/fasilitas'), $fileName);
