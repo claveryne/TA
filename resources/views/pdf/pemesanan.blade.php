@@ -33,6 +33,7 @@
                 <th style="width: 5%;">No</th>
                 <th style="width: 15%;">No Nota</th>
                 <th style="width: 20%;">Nama Pemesan</th>
+                <th style="width: 20%;">Status</th>
                 <th style="width: 25%;">Waktu Acara</th>
                 <th style="width: 35%;">Fasilitas Tambahan</th>
             </tr>
@@ -43,6 +44,7 @@
                 <td class="text-center">{{ $loop->iteration }}</td>
                 <td class="text-center">{{ $item->no_nota }}</td>
                 <td>{{ $item->nama_pemesan }}</td>
+                <td>{{ $item->status_pemesanan }}</td>
                 <td>
                     {{ \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d M Y, H:i') }}<br>
                     s/d<br>

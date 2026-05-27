@@ -18,6 +18,7 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <!-- Calendar -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/id.js'></script>
     <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css' rel='stylesheet' />
     <!-- Flatpickr -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -226,6 +227,39 @@
             text-align: center;
             font-size: 0.9rem;
             color: rgba(253, 246, 238, 0.6);
+        }
+
+        /* Custom Button Styles */
+        .btn-primary-custom {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+            border: 1.5px solid var(--color-primary);
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .btn-primary-custom:hover {
+            background-color: #511B0A;
+            border-color: #511B0A;
+            color: var(--color-text-light);
+        }
+
+        .btn-outline-primary-custom {
+            background-color: transparent;
+            color: var(--color-primary);
+            border: 1.5px solid var(--color-primary);
+            padding: 8px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .btn-outline-primary-custom:hover {
+            background-color: var(--color-primary);
+            color: var(--color-text-light);
+            border-color: var(--color-primary);
         }
     </style>
     @stack('styles')

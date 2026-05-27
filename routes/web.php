@@ -55,6 +55,7 @@ Route::middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function 
     Route::post('/pemeliharaan', [PemeliharaanController::class, 'store'])->name('pemeliharaan.store');
     Route::post('/pemeliharaan/laporan', [PemeliharaanController::class, 'cetakLaporan'])->name('pemeliharaan.laporan');
     Route::post('/pemeliharaan/edit/{id}', [PemeliharaanController::class, 'update'])->name('pemeliharaan.update');
+    Route::post('/pemeliharaan/{id}/batal', [PemeliharaanController::class, 'batal'])->name('pemeliharaan.batal');
     
     Route::get('/pelanggan', [UserController::class, 'indexPelanggan'])->name('pelanggan');
     Route::post('/pelanggan', [UserController::class, 'storePelanggan'])->name('pelanggan.store');
@@ -66,6 +67,7 @@ Route::middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function 
     
     Route::post('/karyawan/jadwal', [UserController::class, 'storeJadwal'])->name('karyawan.jadwal.store');
     Route::post('/karyawan/jadwal/edit/{id}', [UserController::class, 'updateJadwal'])->name('karyawan.jadwal.update');
+    Route::post('/karyawan/jadwal/delete/{id}', [UserController::class, 'deleteJadwal'])->name('karyawan.jadwal.delete');
 });
 
 Route::middleware(['auth', 'prevent-back-history'])->group(function () {

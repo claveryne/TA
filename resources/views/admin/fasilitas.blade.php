@@ -507,9 +507,9 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yakin',
-                        cancelButtonText: 'Tidak',
+                        cancelButtonText: 'Kembali',
                         reverseButtons: true,
-                        confirmButtonColor: '#994D1C',
+                        confirmButtonColor: '#6B240D',
                         cancelButtonColor: '#6c757d'
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -541,9 +541,9 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yakin',
-                        cancelButtonText: 'Tidak',
+                        cancelButtonText: 'Kembali',
                         reverseButtons: true,
-                        confirmButtonColor: '#994D1C',
+                        confirmButtonColor: '#6B240D',
                         cancelButtonColor: '#6c757d'
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -574,10 +574,10 @@
                     text: "Apakah data yang Anda masukkan sudah benar?",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Ya, Simpan!',
-                    cancelButtonText: 'Batal'
+                    cancelButtonText: 'Kembali'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.submit();
@@ -596,10 +596,10 @@
                     text: "Apakah data yang Anda ubah sudah benar?",
                     icon: 'question',
                     showCancelButton: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d',
                     confirmButtonText: 'Ya, Simpan!',
-                    cancelButtonText: 'Batal'
+                    cancelButtonText: 'Kembali'
                 }).then((result) => {
                     if (result.isConfirmed) {
                         this.submit();

@@ -170,6 +170,31 @@
         border-color: var(--color-primary);
         box-shadow: 0 4px 10px rgba(153, 77, 28, 0.25);
     }
+
+    /* Tombol Layout Modal */
+    .layout-btn {
+        background-color: var(--color-primary);
+        color: #ffffff;
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        margin: 4px;
+        border: 1px solid var(--color-primary);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(107, 36, 13, 0.15);
+        outline: none;
+        display: inline-flex;
+        align-items: center;
+    }
+    .layout-btn:hover {
+        background-color: #ffffff;
+        color: var(--color-primary);
+        border-color: var(--color-primary);
+        box-shadow: 0 6px 15px rgba(107, 36, 13, 0.2);
+        transform: translateY(-2px);
+    }
 </style>
 @endpush
 
@@ -292,7 +317,7 @@
                             $layoutName = strtolower(explode(' ', trim($detail))[0]); 
                             $layoutImg = asset_versioned('images/layout-' . $layoutName . '.png');
                         @endphp
-                        <button type="button" class="add-facility-badge me-1" 
+                        <button type="button" class="layout-btn me-1" 
                                 onclick="showLayoutModal('{{ $detail }}', '{{ $layoutImg }}')">
                             <i class="fa-solid fa-border-all me-1"></i>{{ $detail }}
                         </button>

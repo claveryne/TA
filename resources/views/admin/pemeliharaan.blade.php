@@ -208,6 +208,7 @@
                                     data-bs-target="#modalEditPemeliharaan"
                                     data-id="{{ $item->id_pemeliharaan }}"
                                     data-url="{{ route('pemeliharaan.update', $item->id_pemeliharaan) }}"
+                                    data-batal="{{ route('pemeliharaan.batal', $item->id_pemeliharaan) }}"
                                     data-nama="{{ $item->nama_pemeliharaan }}"
                                     data-status="{{ $item->status_pemeliharaan }}"
                                     data-biaya="{{ $item->biaya_pemeliharaan }}"
@@ -396,11 +397,20 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn w-100 text-white fw-bold py-2" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
+                <div class="modal-footer border-0 p-4 pt-0 d-flex gap-2">
+                    <button type="button" id="btnBatalPemeliharaan" class="btn btn-outline-danger flex-grow-1 fw-bold py-2" style="border-radius: 10px; font-size: 1.1rem; display: none;">
+                        BATALKAN
+                    </button>
+                    <button type="submit" class="btn flex-grow-1 text-white fw-bold py-2" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
                         SIMPAN
                     </button>
                 </div>
+            </form>
+
+            <!-- Form Batal Pemeliharaan (diluar form edit) -->
+            <form action="" method="POST" id="formBatalPemeliharaan" class="form-batal-pemeliharaan" style="display: none;">
+                @csrf
+                <button type="submit" id="submitBatalPemeliharaan"></button>
             </form>
 
             <div class="modal-footer justify-content-between">
@@ -454,7 +464,7 @@
                             </select>
                         </div>
                         <div class="col-12 text-center text-muted mt-3">
-                            <small>Laporan akan merekap semua data pemeliharaan yang telah <b>Selesai</b> atau <b>Berjalan</b> pada periode yang dipilih.</small>
+                            <small>Laporan akan merekap semua data pemeliharaan yang telah <b>Berjalan</b>, <b>Selesai</b>, atau <b>Dibatalkan</b> pada periode yang dipilih.</small>
                         </div>
                     </div>
                 </div>
@@ -482,9 +492,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -516,9 +526,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -533,6 +543,49 @@
                         setTimeout(() => editForm.submit(), 300);
                     }
                 });
+            });
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const batalForms = document.querySelectorAll('.form-batal-pemeliharaan');
+        batalForms.forEach(form => {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah Anda yakin ingin membatalkan pemeliharaan ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Batalkan',
+                    cancelButtonText: 'Kembali',
+                    reverseButtons: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Membatalkan...',
+                            text: 'Mohon tunggu sebentar',
+                            didOpen: () => Swal.showLoading(),
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => form.submit(), 300);
+                    }
+                });
+            });
+        });
+
+        const btnBatal = document.getElementById('btnBatalPemeliharaan');
+        if (btnBatal) {
+            btnBatal.addEventListener('click', function () {
+                const submitBtn = document.getElementById('submitBatalPemeliharaan');
+                if (submitBtn) {
+                    submitBtn.click();
+                }
             });
         }
     });
@@ -568,7 +621,20 @@
             // Isi nilai inputan di dalam modal
             modalEditPemeliharaan.querySelector('input[name="id_pemeliharaan"]').value = id;
             modalEditPemeliharaan.querySelector('select[name="nama_pemeliharaan"]').value = nama;
-            modalEditPemeliharaan.querySelector('select[name="status_pemeliharaan"]').value = status;
+            var selectStatus = modalEditPemeliharaan.querySelector('select[name="status_pemeliharaan"]');
+            var optDibatalkan = selectStatus.querySelector('option[value="Dibatalkan"]');
+            if (optDibatalkan) {
+                optDibatalkan.remove();
+            }
+            if (status === 'Dibatalkan') {
+                var newOpt = document.createElement('option');
+                newOpt.value = 'Dibatalkan';
+                newOpt.text = 'Dibatalkan';
+                newOpt.selected = true;
+                selectStatus.add(newOpt);
+            } else {
+                selectStatus.value = status;
+            }
             modalEditPemeliharaan.querySelector('input[name="biaya_pemeliharaan"]').value = biaya;
             modalEditPemeliharaan.querySelector('select[name="jenis_pemeliharaan"]').value = jenis;
             modalEditPemeliharaan.querySelector('input[name="jumlah_pemeliharaan"]').value = jumlah;
@@ -595,6 +661,20 @@
             } else {
                 previewLink.style.display = 'none';
                 previewLink.onclick = null;
+            }
+
+            var batalUrl = button.getAttribute('data-batal');
+            var formBatal = document.getElementById('formBatalPemeliharaan');
+            var btnBatal = document.getElementById('btnBatalPemeliharaan');
+            
+            if (formBatal && btnBatal) {
+                if (status === 'Berjalan') {
+                    formBatal.action = batalUrl;
+                    btnBatal.style.display = 'inline-block';
+                } else {
+                    btnBatal.style.display = 'none';
+                    formBatal.action = '';
+                }
             }
         });
     });

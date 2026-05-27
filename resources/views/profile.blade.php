@@ -173,14 +173,14 @@
                                         <i class="fa-solid fa-calendar-alt me-2"></i>
                                         <div class="d-inline-block">
                                             <span class="label">Bergabung Sejak</span>
-                                            <span class="value">{{ Auth::user()->created_at->format('d M Y') }}</span>
+                                            <span class="value">{{ Auth::user()->created_at->translatedFormat('d M Y') }}</span>
                                         </div>
                                     </div>
                                     <div class="info-item">
                                         <i class="fa-solid fa-calendar-alt me-2"></i>
                                         <div class="d-inline-block">
                                             <span class="label">Terakhir Diperbarui</span>
-                                            <span class="value">{{ Auth::user()->updated_at->format('d M Y H:i') }}
+                                            <span class="value">{{ Auth::user()->updated_at->translatedFormat('d M Y H:i') }}
                                                 WIB</span>
                                         </div>
                                     </div>
@@ -306,9 +306,9 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yakin',
-                        cancelButtonText: 'Tidak',
+                        cancelButtonText: 'Kembali',
                         reverseButtons: true,
-                        confirmButtonColor: '#612713',
+                        confirmButtonColor: '#6B240D',
                         cancelButtonColor: '#6c757d'
                     }).then((result) => {
                         if (result.isConfirmed) {

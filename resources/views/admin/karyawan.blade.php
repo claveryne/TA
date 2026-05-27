@@ -507,18 +507,22 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn w-100 text-white fw-bold py-2" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
-                        SIMPAN
+                <div class="modal-footer border-0 p-4 pt-0 d-flex justify-content-between gap-3">
+                    <button type="button" id="btnHapusJadwal" class="btn btn-outline-danger fw-bold py-2 flex-grow-1" style="border-radius: 10px; font-size: 1.1rem;">
+                        HAPUS
                     </button>
-                    <button type="button" class="btn w-100 mt-2 text-white fw-bold py-2" style="background-color: #888; border-radius: 10px; font-size: 1.1rem;" data-bs-toggle="modal" data-bs-target="#modalJadwalKaryawan">
-                        KALENDER
+                    <button type="submit" class="btn text-white fw-bold py-2 flex-grow-1" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
+                        SIMPAN
                     </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+<form id="formHapusJadwal" method="POST" style="display: none;">
+    @csrf
+</form>
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -574,6 +578,7 @@
 
         if (calendarEl && typeof FullCalendar !== 'undefined') {
             calendar = new FullCalendar.Calendar(calendarEl, {
+                locale: 'id',
                 initialView: 'dayGridMonth',
                 headerToolbar: {
                     left: 'prev,next',
@@ -632,9 +637,49 @@
                         document.getElementById('edit_tanggal').value = props.tanggal;
                     }
 
+                    var btnHapus = document.getElementById('btnHapusJadwal');
+                    if (btnHapus) {
+                        btnHapus.setAttribute('data-id', props.id_jadwal);
+                    }
+
                     var myModal = new bootstrap.Modal(document.getElementById('modalEditJadwal'));
                     myModal.show();
                 }
+            });
+        }
+
+        var btnHapusJadwal = document.getElementById('btnHapusJadwal');
+        if (btnHapusJadwal) {
+            btnHapusJadwal.addEventListener('click', function() {
+                var idJadwal = this.getAttribute('data-id');
+                if (!idJadwal) return;
+
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah Anda yakin ingin menghapus jadwal ini?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yakin',
+                    cancelButtonText: 'Kembali',
+                    reverseButtons: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            text: 'Mohon tunggu sebentar',
+                            didOpen: () => Swal.showLoading(),
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false
+                        });
+                        
+                        var formHapus = document.getElementById('formHapusJadwal');
+                        formHapus.action = "{{ url('karyawan/jadwal/delete') }}/" + idJadwal;
+                        setTimeout(() => formHapus.submit(), 300);
+                    }
+                });
             });
         }
 
@@ -663,9 +708,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -697,9 +742,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {

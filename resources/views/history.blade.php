@@ -252,10 +252,8 @@
 
         <div class="history-container">
             @if(count($histories) > 0)
-                
                 @foreach($histories as $item)
                 @php
-                    // Mapping status to CSS class
                     $statusClass = 'status-menunggu';
                     $statusText = $item->status_pemesanan;
                     $statusLower = strtolower($statusText);
@@ -270,16 +268,13 @@
                         $statusClass = 'status-menunggu';
                     }
 
-                    // Image Source
                     $imageSrc = asset('images/gambarLogo.png');
                     if ($item->ruangan && $item->ruangan->foto_ruangan) {
                         $imageSrc = asset('uploads/ruangan/' . $item->ruangan->foto_ruangan);
                     }
 
-                    // Room Name
                     $roomName = $item->ruangan ? $item->ruangan->nama_ruangan : 'Pemesanan Fasilitas';
 
-                    // Dates
                     $tglPesan = \Carbon\Carbon::parse($item->tgl_pesan)->translatedFormat('d F Y');
                     $tglMulai = \Carbon\Carbon::parse($item->tgl_mulai)->translatedFormat('d F Y, H:i');
                     $tglSelesai = \Carbon\Carbon::parse($item->tgl_selesai)->translatedFormat('d F Y, H:i');
@@ -314,11 +309,14 @@
                                         <h4>{{ $roomName }}</h4>
                                         <div class="d-flex flex-column flex-md-row justify-content-md-between align-items-start align-items-md-end mt-2">
                                             <div class="detail-info">
-                                                <p class="mb-1"><i class="fas fa-calendar-alt me-2" style="color: var(--color-primary); width: 20px;"></i> Tanggal: <strong>{{ $tglAcara }}</strong></p>
-                                                <p class="mb-0"><i class="fas fa-info-circle me-2" style="color: var(--color-primary); width: 20px;"></i> Kegiatan: {{ $item->nama_acara }}</p>
+                                                <p class="mb-1"><i class="fas fa-calendar-alt me-2" style="color: var(--color-primary); width: 20px;"></i> 
+                                                    Tanggal: <strong>{{ $tglAcara }}</strong></p>
+                                                <p class="mb-0"><i class="fas fa-info-circle me-2" style="color: var(--color-primary); width: 20px;"></i> 
+                                                    Kegiatan: {{ $item->nama_acara }}</p>
                                             </div>
                                             <div class="mt-3 mt-md-0 align-self-end align-self-md-auto">
-                                                <a href="#" class="btn-detail" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $item->id_pemesanan }}">Lihat Detail</a>
+                                                <a href="#" class="btn-detail" data-bs-toggle="modal" data-bs-target="#modalDetail{{ $item->id_pemesanan }}">
+                                                    Lihat Detail</a>
                                             </div>
                                         </div>
                                     </div>
@@ -380,7 +378,7 @@
 
                                     @if($item->keterangan_pemesanan)
                                     <div class="col-md-12 mb-3">
-                                        <label class="text-muted small">Keterangan Khusus</label>
+                                        <label class="text-muted small">Catatan</label>
                                         <p class="fw-bold mb-0">{{ $item->keterangan_pemesanan }}</p>
                                     </div>
                                     @endif
@@ -400,14 +398,17 @@
 
                             <div class="modal-footer" style="background-color: #fcf8f5; border-top: 1px solid #f0e6e1;">
                                 @if(strtolower($item->status_pemesanan) == 'menunggu')
-                                    <form action="{{ route('pemesanan.batal', $item->id_pemesanan) }}" method="POST" class="d-inline form-batal">
+                                    <form action="{{ route('pemesanan.batal', $item->id_pemesanan) }}" method="POST" 
+                                        class="d-inline form-batal">
                                         @csrf
-                                        <button type="submit" class="btn btn-danger">Batal</button>
+                                        <button type="submit" class="btn btn-outline-danger">Batal</button>
                                     </form>
-                                @elseif(strtolower($item->status_pemesanan) == 'disetujui' || strtolower($item->status_pemesanan) == 'selesai')
-                                    <form action="{{ route('pemesanan.nota', $item->id_pemesanan) }}" method="POST" class="d-inline form-nota" target="_blank">
+                                @elseif(strtolower($item->status_pemesanan) == 'disetujui' || 
+                                        strtolower($item->status_pemesanan) == 'selesai')
+                                    <form action="{{ route('pemesanan.nota', $item->id_pemesanan) }}" method="POST" 
+                                        class="d-inline form-nota" target="_blank">
                                         @csrf
-                                        <button type="submit" class="btn btn-success">Lihat Nota</button>
+                                        <button type="submit" class="btn btn-primary-custom">Lihat Nota</button>
                                     </form>
                                 @endif
                             </div>
@@ -441,10 +442,10 @@
                     text: 'Apakah Anda yakin ingin membatalkan pemesanan ini?',
                     icon: 'warning',
                     showCancelButton: true,
-                    confirmButtonText: 'Ya, Batalkan',
-                    cancelButtonText: 'Tidak',
+                    confirmButtonText: 'Batalkan',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#881622ff',
+                    confirmButtonColor: '#dc3545',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -473,9 +474,9 @@
                     icon: 'info',
                     showCancelButton: true,
                     confirmButtonText: 'Lihat Nota',
-                    cancelButtonText: 'Batal',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#155724',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {

@@ -79,6 +79,11 @@ class FasilitasController extends Controller
 
             return redirect()->back()->with('success', 'Data fasilitas berhasil ditambahkan!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (\Exception $e) {
             Log::error('GAGAL menambahkan data fasilitas.', [
                 'error_message' => $e->getMessage(),
@@ -125,6 +130,25 @@ class FasilitasController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $request->validate([
+                'nama_fasilitas' => 'required|max:255',
+                'jenis_fasilitas' => 'required|max:20',
+                'jumlah_fasilitas' => 'required|integer',
+                'merk_fasilitas' => 'required|max:255',
+                'foto_fasilitas' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'keterangan_fasilitas' => 'nullable|max:255',
+                'status_fasilitas' => 'required|max:20',
+
+                'warnaMM' => 'nullable|string|max:255',
+                'warnaS' => 'nullable|string|max:255',
+                'warnaL' => 'nullable|string|max:255',
+                'warnaM' => 'nullable|string|max:255',
+                'warnaU' => 'nullable|string|max:255',
+                'ukuranU' => 'nullable|numeric',
+                'ukuranR' => 'nullable|numeric',
+                'kapasitasR' => 'nullable|integer',
+            ]);
+
             Log::info('Mencoba mengupdate data fasilitas: ' . $request->nama_fasilitas);
 
             $fasilitasOld = Fasilitas::find($id);
@@ -188,6 +212,11 @@ class FasilitasController extends Controller
 
             return redirect()->back()->with('success', 'Data fasilitas berhasil diupdate!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (\Exception $e) {
             Log::error('GAGAL mengupdate data fasilitas.', [
                 'error_message' => $e->getMessage(),

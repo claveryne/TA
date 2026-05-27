@@ -406,9 +406,9 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yakin',
-                        cancelButtonText: 'Tidak',
+                        cancelButtonText: 'Kembali',
                         reverseButtons: true,
-                        confirmButtonColor: '#994D1C',
+                        confirmButtonColor: '#6B240D',
                         cancelButtonColor: '#6c757d'
                     }).then((result) => {
                         if (result.isConfirmed) {
@@ -440,9 +440,9 @@
                         icon: 'question',
                         showCancelButton: true,
                         confirmButtonText: 'Yakin',
-                        cancelButtonText: 'Tidak',
+                        cancelButtonText: 'Kembali',
                         reverseButtons: true,
-                        confirmButtonColor: '#994D1C',
+                        confirmButtonColor: '#6B240D',
                         cancelButtonColor: '#6c757d'
                     }).then((result) => {
                         if (result.isConfirmed) {

@@ -419,6 +419,7 @@
             var el = document.getElementById(elId);
             if (!el) return null;
             var cal = new FullCalendar.Calendar(el, {
+                locale: 'id',
                 initialView: 'dayGridMonth',
                 events: eventsData,
                 height: 'auto',

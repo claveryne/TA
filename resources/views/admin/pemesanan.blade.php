@@ -478,7 +478,7 @@
 
                                     @if($item->keterangan_pemesanan)
                                     <div class="col-md-12 mb-3">
-                                        <label class="text-muted small">Keterangan Khusus</label>
+                                        <label class="text-muted small">Catatan</label>
                                         <p class="fw-bold mb-0">{{ $item->keterangan_pemesanan }}</p>
                                     </div>
                                     @endif
@@ -501,22 +501,29 @@
                                     <form action="{{ route('pemesanan.status', $item->id_pemesanan) }}" method="POST" class="d-inline form-tolak">
                                         @csrf
                                         <input type="hidden" name="action" value="tolak">
-                                        <button type="submit" class="btn btn-danger">Tolak</button>
+                                        <button type="submit" class="btn btn-outline-primary-custom">Tolak</button>
                                     </form>
                                     <form action="{{ route('pemesanan.status', $item->id_pemesanan) }}" method="POST" class="d-inline form-setujui">
                                         @csrf
                                         <input type="hidden" name="action" value="setuju">
-                                        <button type="submit" class="btn btn-success">Setujui</button>
+                                        <button type="submit" class="btn btn-primary-custom">Setujui</button>
                                     </form>
                                 @elseif(strtolower($item->status_pemesanan) == 'disetujui')
-                                    <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id_pemesanan }}" data-bs-dismiss="modal">Ubah Detail</button>
+                                    <form action="{{ route('pemesanan.status', $item->id_pemesanan) }}" method="POST" class="d-inline form-batal-admin">
+                                        @csrf
+                                        <input type="hidden" name="action" value="batal">
+                                        <button type="submit" class="btn btn-outline-danger" style="border-radius: 10px; padding: 8px 20px; font-weight: 600; font-size: 0.95rem;">Batal</button>
+                                    </form>
+                                    <button type="button" class="btn btn-outline-primary-custom" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id_pemesanan }}" 
+                                        data-bs-dismiss="modal">Ubah Detail</button>
                                     <form action="{{ route('pemesanan.status', $item->id_pemesanan) }}" method="POST" class="d-inline form-selesai">
                                         @csrf
                                         <input type="hidden" name="action" value="selesai">
-                                        <button type="submit" class="btn btn-primary">Selesaikan Pesanan</button>
+                                        <button type="submit" class="btn btn-primary-custom">Selesaikan Pesanan</button>
                                     </form>
                                 @elseif(strtolower($item->status_pemesanan) == 'selesai')
-                                    <button type="button" class="btn btn-secondary" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id_pemesanan }}" data-bs-dismiss="modal">Ubah Detail</button>
+                                    <button type="button" class="btn btn-outline-primary-custom" data-bs-toggle="modal" data-bs-target="#modalEdit{{ $item->id_pemesanan }}" 
+                                        data-bs-dismiss="modal">Ubah Detail</button>
                                 @endif
                             </div>
                         </div>
@@ -533,27 +540,30 @@
                             </div>
                             <form action="{{ route('pemesanan.edit', $item->id_pemesanan) }}" method="POST" class="form-edit" enctype="multipart/form-data">
                                 @csrf
+                                @php
+                                    $isFailed = session('failed_booking_id') == $item->id_pemesanan;
+                                @endphp
                                 <div class="modal-body p-4" style="background-color: #ffffff;">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Nama Pemesan <span class="text-danger">*</span></label>
-                                            <input type="text" name="nama_pemesan" class="form-control" value="{{ $item->nama_pemesan }}" required>
+                                            <input type="text" name="nama_pemesan" class="form-control" value="{{ $isFailed ? old('nama_pemesan', $item->nama_pemesan) : $item->nama_pemesan }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Nomor Telepon <span class="text-danger">*</span></label>
-                                            <input type="tel" name="telp_pemesan" class="form-control" value="{{ $item->telp_pemesan }}" required>
+                                            <input type="tel" name="telp_pemesan" class="form-control" value="{{ $isFailed ? old('telp_pemesan', $item->telp_pemesan) : $item->telp_pemesan }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Email Aktif <span class="text-danger">*</span></label>
-                                            <input type="email" name="email_pemesan" class="form-control" value="{{ $item->email_pemesan }}" required>
+                                            <input type="email" name="email_pemesan" class="form-control" value="{{ $isFailed ? old('email_pemesan', $item->email_pemesan) : $item->email_pemesan }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Alamat Lengkap <span class="text-danger">*</span></label>
-                                            <input type="text" name="alamat_pemesan" class="form-control" value="{{ $item->alamat_pemesan }}" required>
+                                            <input type="text" name="alamat_pemesan" class="form-control" value="{{ $isFailed ? old('alamat_pemesan', $item->alamat_pemesan) : $item->alamat_pemesan }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Instansi - Acara <span class="text-danger">*</span></label>
-                                            <input type="text" name="nama_acara" class="form-control" value="{{ $item->nama_acara }}" required>
+                                            <input type="text" name="nama_acara" class="form-control" value="{{ $isFailed ? old('nama_acara', $item->nama_acara) : $item->nama_acara }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Bukti Pemesanan</label>
@@ -564,14 +574,14 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Jumlah Orang <span class="text-danger">*</span></label>
-                                            <input type="number" name="jumlah_orang" class="form-control" value="{{ $item->jumlah_orang }}" required>
+                                            <input type="number" name="jumlah_orang" class="form-control" value="{{ $isFailed ? old('jumlah_orang', $item->jumlah_orang) : $item->jumlah_orang }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Pilih Ruangan <span class="text-danger">*</span></label>
-                                            <select name="id_ruangan" class="form-select" style="cursor: pointer;" required>
+                                            <select name="id_ruangan" class="form-select select-ruangan-admin" style="cursor: pointer;" required>
                                                 <option value="" selected disabled>Pilih opsi...</option>
                                                 @foreach($ruangans as $ruangan)
-                                                    <option value="{{ $ruangan->id_ruangan }}" {{ $item->id_ruangan == $ruangan->id_ruangan ? 'selected' : '' }}>
+                                                    <option value="{{ $ruangan->id_ruangan }}" data-nama="{{ $ruangan->nama_ruangan }}" {{ ($isFailed ? old('id_ruangan', $item->id_ruangan) : $item->id_ruangan) == $ruangan->id_ruangan ? 'selected' : '' }}>
                                                         {{ $ruangan->nama_ruangan }} - {{ $ruangan->kapasitas_ruangan }} orang
                                                     </option>
                                                 @endforeach
@@ -579,11 +589,11 @@
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Waktu Mulai <span class="text-danger">*</span></label>
-                                            <input type="datetime-local" name="tgl_mulai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_mulai)) }}" required>
+                                            <input type="datetime-local" name="tgl_mulai" class="form-control" value="{{ $isFailed ? old('tgl_mulai', date('Y-m-d\TH:i', strtotime($item->tgl_mulai))) : date('Y-m-d\TH:i', strtotime($item->tgl_mulai)) }}" required>
                                         </div>
                                         <div class="col-md-6">
                                             <label class="form-label text-muted small">Waktu Selesai <span class="text-danger">*</span></label>
-                                            <input type="datetime-local" name="tgl_selesai" class="form-control" value="{{ date('Y-m-d\TH:i', strtotime($item->tgl_selesai)) }}" required>
+                                            <input type="datetime-local" name="tgl_selesai" class="form-control" value="{{ $isFailed ? old('tgl_selesai', date('Y-m-d\TH:i', strtotime($item->tgl_selesai))) : date('Y-m-d\TH:i', strtotime($item->tgl_selesai)) }}" required>
                                         </div>
                                         <div class="col-12 mt-4">
                                             <label class="form-label text-muted fw-bold mb-3">Fasilitas Tambahan</label>
@@ -592,22 +602,22 @@
                                                     $itemFasilitas = $item->detailF ? $item->detailF->pluck('jumlah_fasilitas', 'id_fasilitas')->toArray() : [];
                                                 @endphp
                                                 @foreach($fasilitases as $jenis => $fasItems)
-                                                    <div class="col-md-4 col-sm-6">
+                                                    <div class="col-md-4 col-sm-6 group-facility-admin-container" id="group-facility-admin-{{ Str::slug($jenis) }}-{{ $item->id_pemesanan }}" data-jenis="{{ Str::slug($jenis) }}">
                                                         <div class="facility-group">
                                                             <h6 class="text-primary mb-2" style="color: #612713 !important;"><strong>{{ $jenis }}</strong></h6>
                                                             <div class="child-facilities ms-2 border-start ps-2 mt-1">
                                                                 @foreach($fasItems as $fas)
                                                                     @php
-                                                                        $isChecked = array_key_exists($fas->id_fasilitas, $itemFasilitas);
-                                                                        $qty = $isChecked ? $itemFasilitas[$fas->id_fasilitas] : 1;
+                                                                        $isChecked = $isFailed ? (is_array(old('fasilitas')) && in_array($fas->id_fasilitas, old('fasilitas'))) : array_key_exists($fas->id_fasilitas, $itemFasilitas);
+                                                                        $qty = $isFailed ? old('qty_fasilitas.' . $fas->id_fasilitas, (array_key_exists($fas->id_fasilitas, $itemFasilitas) ? $itemFasilitas[$fas->id_fasilitas] : 1)) : (array_key_exists($fas->id_fasilitas, $itemFasilitas) ? $itemFasilitas[$fas->id_fasilitas] : 1);
                                                                     @endphp
-                                                                    <div class="form-check mb-2 d-flex align-items-center">
+                                                                    <div class="form-check mb-2 d-flex align-items-center facility-item-row-admin" data-nama-fasilitas="{{ $fas->nama_fasilitas }}">
                                                                         <div>
-                                                                            <input class="form-check-input" name="fasilitas[]" type="checkbox" value="{{ $fas->id_fasilitas }}" id="item_{{ $fas->id_fasilitas }}_{{ $item->id_pemesanan }}" {{ $isChecked ? 'checked' : '' }}>
+                                                                            <input class="form-check-input child-checkbox-admin" name="fasilitas[]" type="checkbox" value="{{ $fas->id_fasilitas }}" id="item_{{ $fas->id_fasilitas }}_{{ $item->id_pemesanan }}" {{ $isChecked ? 'checked' : '' }}>
                                                                             <label class="form-check-label text-muted" style="font-size: 0.85rem;" for="item_{{ $fas->id_fasilitas }}_{{ $item->id_pemesanan }}">{{ $fas->nama_fasilitas }}</label>
                                                                         </div>
                                                                         @if($fas->jumlah_fasilitas > 1)
-                                                                            <input type="number" name="qty_fasilitas[{{ $fas->id_fasilitas }}]" class="form-control form-control-sm ms-auto" style="width: 70px; padding: 0.2rem 0.5rem; font-size: 0.8rem;" min="1" max="{{ $fas->jumlah_fasilitas }}" placeholder="Jml" value="{{ $qty }}">
+                                                                            <input type="number" name="qty_fasilitas[{{ $fas->id_fasilitas }}]" class="form-control form-control-sm ms-auto qty-input-field" style="width: 70px; padding: 0.2rem 0.5rem; font-size: 0.8rem;" min="1" max="{{ $fas->jumlah_fasilitas }}" placeholder="Jml" value="{{ $qty }}">
                                                                         @endif
                                                                     </div>
                                                                 @endforeach
@@ -618,18 +628,26 @@
                                             </div>
                                         </div>
                                         <div class="col-md-12">
-                                            <label class="form-label text-muted small">Keterangan Khusus</label>
-                                            <textarea name="keterangan_pemesanan" class="form-control" rows="3" style="resize: none;">{{ $item->keterangan_pemesanan }}</textarea>
+                                            <label class="form-label text-muted small">Catatan</label>
+                                            <textarea name="keterangan_pemesanan" class="form-control" rows="3" style="resize: none;">{{ $isFailed ? old('keterangan_pemesanan', $item->keterangan_pemesanan) : $item->keterangan_pemesanan }}</textarea>
                                         </div>
                                     </div>
                                 </div>
                                 <div class="modal-footer" style="background-color: #fcf8f5; border-top: 1px solid #f0e6e1;">
-                                    <button type="submit" class="btn btn-warning">Simpan Perubahan</button>
+                                    <button type="submit" class="btn btn-primary-custom">Simpan Perubahan</button>
                                 </div>
                             </form>
                         </div>
                     </div>
                 </div>
+                @if($isFailed)
+                <script>
+                    document.addEventListener('DOMContentLoaded', function() {
+                        var myModal = new bootstrap.Modal(document.getElementById('modalEdit{{ $item->id_pemesanan }}'));
+                        myModal.show();
+                    });
+                </script>
+                @endif
 
             @endforeach
 
@@ -683,7 +701,7 @@
                                 </select>
                             </div>
                             <div class="col-12 text-center text-muted mt-3">
-                                <small>Laporan akan merekap semua data pemesanan yang telah <b>Disetujui</b> atau <b>Selesai</b> pada periode yang dipilih.</small>
+                                <small>Laporan akan merekap semua data pemesanan yang telah <b>Disetujui</b>, <b>Ditolak</b>, <b>Dibatalkan</b>, atau <b>Selesai</b> pada periode yang dipilih.</small>
                             </div>
                         </div>
                     </div>
@@ -709,9 +727,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -739,9 +757,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -769,9 +787,39 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menyimpan...',
+                            text: 'Mohon tunggu sebentar',
+                            didOpen: () => Swal.showLoading(),
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false
+                        });
+                        setTimeout(() => form.submit(), 300);
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.form-batal-admin').forEach(function(form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah Anda yakin ingin membatalkan pemesanan?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Batalkan',
+                    cancelButtonText: 'Kembali',
+                    reverseButtons: true,
+                    confirmButtonColor: '#dc3545',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -799,9 +847,9 @@
                     icon: 'question',
                     showCancelButton: true,
                     confirmButtonText: 'Yakin',
-                    cancelButtonText: 'Tidak',
+                    cancelButtonText: 'Kembali',
                     reverseButtons: true,
-                    confirmButtonColor: '#994D1C',
+                    confirmButtonColor: '#6B240D',
                     cancelButtonColor: '#6c757d'
                 }).then((result) => {
                     if (result.isConfirmed) {
@@ -817,6 +865,74 @@
                     }
                 });
             });
+        });
+
+        // Filter room facilities in admin edit modals
+        function updateRoomFacilitiesAdmin(form) {
+            const selectRoom = form.querySelector('.select-ruangan-admin');
+            if (!selectRoom) return;
+
+            const selectedOption = selectRoom.options[selectRoom.selectedIndex];
+            const selectedRoomName = selectedOption ? (selectedOption.getAttribute('data-nama') || '').toLowerCase() : '';
+
+            const groupContainer = form.querySelector('.group-facility-admin-container[data-jenis="ruangan"]');
+            if (!groupContainer) return;
+
+            const itemRows = groupContainer.querySelectorAll('.facility-item-row-admin');
+            
+            let visibleCount = 0;
+
+            itemRows.forEach(row => {
+                const facilityName = (row.getAttribute('data-nama-fasilitas') || '').toLowerCase();
+                let shouldShow = true;
+
+                if (selectedRoomName.includes('vyria')) {
+                    if (facilityName.includes('vyria') || facilityName.includes('mahacitta')) {
+                        shouldShow = false;
+                    }
+                } else if (selectedRoomName.includes('vilasita') || selectedRoomName.includes('villasita')) {
+                    if (facilityName.includes('vilasita') || facilityName.includes('villasita') || facilityName.includes('mahacitta')) {
+                        shouldShow = false;
+                    }
+                } else if (selectedRoomName.includes('mahacitta')) {
+                    if (facilityName.includes('mahacitta')) {
+                        shouldShow = false;
+                    }
+                } else {
+                    shouldShow = false;
+                }
+
+                if (shouldShow) {
+                    row.style.setProperty('display', 'flex', 'important');
+                    visibleCount++;
+                } else {
+                    row.style.setProperty('display', 'none', 'important');
+                    const checkbox = row.querySelector('.child-checkbox-admin, input[type="checkbox"]');
+                    if (checkbox && checkbox.checked) {
+                        checkbox.checked = false;
+                    }
+                    const qtyField = row.querySelector('.qty-input-field');
+                    if (qtyField) {
+                        qtyField.value = 1;
+                    }
+                }
+            });
+
+            if (visibleCount > 0) {
+                groupContainer.style.setProperty('display', 'block', 'important');
+            } else {
+                groupContainer.style.setProperty('display', 'none', 'important');
+            }
+        }
+
+        document.querySelectorAll('.form-edit').forEach(function(form) {
+            const selectRoom = form.querySelector('.select-ruangan-admin');
+            if (selectRoom) {
+                selectRoom.addEventListener('change', function() {
+                    updateRoomFacilitiesAdmin(form);
+                });
+                updateRoomFacilitiesAdmin(form);
+            }
         });
     });
 </script>

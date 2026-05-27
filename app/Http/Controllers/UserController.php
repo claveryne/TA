@@ -48,6 +48,11 @@ class UserController extends Controller
 
             return redirect()->back()->with('success', 'Profil Anda berhasil diperbarui!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate profile.', [
                 'error_message' => $e->getMessage(),
@@ -100,6 +105,11 @@ class UserController extends Controller
 
             return redirect()->back()->with('success', 'Data karyawan berhasil ditambahkan!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL menambahkan data karyawan.', [
                 'error_message' => $e->getMessage(),
@@ -137,6 +147,17 @@ class UserController extends Controller
     public function updateKaryawan(Request $request, $id)
     {
         try {
+            $request->validate([
+                'name'    => 'required|max:255',
+                'email'   => 'required|max:255',
+                'phone'   => 'required|max:15',
+                'address' => 'required|max:255',
+                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'role'    => 'required|max:10',
+                'status'  => 'required|max:20',
+                'password' => 'nullable|min:8|confirmed',
+            ]);
+
             Log::info('Mencoba mengupdate data karyawan: ' . $request->name);
 
             $userOld = User::find($id);
@@ -175,6 +196,11 @@ class UserController extends Controller
 
             return redirect()->back()->with('success', 'Data karyawan berhasil diupdate!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate data karyawan.', [
                 'error_message' => $e->getMessage(),
@@ -214,6 +240,11 @@ class UserController extends Controller
             JadwalKaryawan::create($data);
 
             return redirect()->back()->with('success', 'Jadwal karyawan berhasil ditambahkan!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
@@ -246,6 +277,21 @@ class UserController extends Controller
             JadwalKaryawan::where('id_jadwal', $id)->update($data);
 
             return redirect()->back()->with('success', 'Jadwal karyawan berhasil diupdate!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteJadwal($id)
+    {
+        try {
+            JadwalKaryawan::where('id_jadwal', $id)->delete();
+            return redirect()->back()->with('success', 'Jadwal karyawan berhasil dihapus!');
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
         }
@@ -292,6 +338,11 @@ class UserController extends Controller
 
             return redirect()->back()->with('success', 'Data pelanggan berhasil ditambahkan!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL menambahkan data pelanggan.', [
                 'error_message' => $e->getMessage(),
@@ -325,6 +376,17 @@ class UserController extends Controller
     public function updatePelanggan(Request $request, $id)
     {
         try {
+            $request->validate([
+                'name'    => 'required|max:255',
+                'email'   => 'required|max:255',
+                'phone'   => 'required|max:15',
+                'address' => 'required|max:255',
+                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'role'    => 'nullable|max:10',
+                'status'  => 'nullable|max:20',
+                'password' => 'nullable|min:8|confirmed',
+            ]);
+
             Log::info('Mencoba mengupdate data pelanggan: ' . $request->name);
 
             $userOld = User::find($id);
@@ -363,6 +425,11 @@ class UserController extends Controller
 
             return redirect()->back()->with('success', 'Data pelanggan berhasil diupdate!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate data pelanggan.', [
                 'error_message' => $e->getMessage(),

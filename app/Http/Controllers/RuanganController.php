@@ -14,8 +14,8 @@ class RuanganController extends Controller
     {
         try {
             $request->validate([
-                'nama_ruangan'      => 'required|max:20',
-                'jenis_ruangan'     => 'required|max:20',
+                'nama_ruangan'      => 'required|max:255',
+                'jenis_ruangan'     => 'required|max:255',
                 'ukuran_ruangan'    => 'required|numeric',
                 'kapasitas_ruangan' => 'required|integer',
                 'foto_ruangan'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
@@ -49,6 +49,11 @@ class RuanganController extends Controller
 
             return redirect()->back()->with('success', 'Data ruangan berhasil ditambahkan!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL menambahkan data ruangan.', [
                 'error_message' => $e->getMessage(),
@@ -83,6 +88,16 @@ class RuanganController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $request->validate([
+                'nama_ruangan'      => 'required|max:255',
+                'jenis_ruangan'     => 'required|max:255',
+                'ukuran_ruangan'    => 'required|numeric',
+                'kapasitas_ruangan' => 'required|integer',
+                'foto_ruangan'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'keterangan_ruangan'=> 'nullable|max:255',
+                'status_ruangan'    => 'required|max:20',
+            ]);
+
             Log::info('Mencoba mengupdate data ruangan: ' . $request->nama_ruangan);
 
             $ruanganOld = Ruangan::find($id);
@@ -115,6 +130,11 @@ class RuanganController extends Controller
 
             return redirect()->back()->with('success', 'Data ruangan berhasil diupdate!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate data ruangan.', [
                 'error_message' => $e->getMessage(),

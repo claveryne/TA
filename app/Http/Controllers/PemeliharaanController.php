@@ -40,13 +40,13 @@ class PemeliharaanController extends Controller
     {
         try {
             $request->validate([
-                'nama_pemeliharaan'       => 'required|max:20',
-                'jenis_pemeliharaan'      => 'required|max:20',
-                'biaya_pemeliharaan'      => 'nullable|double',
+                'nama_pemeliharaan'       => 'required|max:255',
+                'jenis_pemeliharaan'      => 'required|max:255',
+                'biaya_pemeliharaan'      => 'nullable|numeric',
                 'jumlah_pemeliharaan'     => 'nullable|integer',
                 'status_pemeliharaan'     => 'required|max:20',
-                'tglMulai_pemeliharaan'   => 'required',
-                'tglSelesai_pemeliharaan' => 'nullable',
+                'tglMulai_pemeliharaan'   => 'required|date',
+                'tglSelesai_pemeliharaan' => 'nullable|date|after_or_equal:tglMulai_pemeliharaan',
                 'bukti_pemeliharaan'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'keterangan_pemeliharaan' => 'nullable',
             ]);
@@ -100,6 +100,11 @@ class PemeliharaanController extends Controller
 
             return redirect()->back()->with('success', 'Data pemeliharaan berhasil ditambahkan!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL menambahkan data pemeliharaan.', [
                 'error_message' => $e->getMessage(),
@@ -115,6 +120,18 @@ class PemeliharaanController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $request->validate([
+                'nama_pemeliharaan'       => 'required|max:255',
+                'jenis_pemeliharaan'      => 'required|max:255',
+                'biaya_pemeliharaan'      => 'nullable|numeric',
+                'jumlah_pemeliharaan'     => 'nullable|integer',
+                'status_pemeliharaan'     => 'required|max:20',
+                'tglMulai_pemeliharaan'   => 'required|date',
+                'tglSelesai_pemeliharaan' => 'nullable|date|after_or_equal:tglMulai_pemeliharaan',
+                'bukti_pemeliharaan'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'keterangan_pemeliharaan' => 'nullable',
+            ]);
+
             Log::info('Mencoba mengupdate data pemeliharaan: ' . $request->nama_pemeliharaan);
 
             $pemeliharaanOld = Pemeliharaan::find($id);
@@ -166,6 +183,11 @@ class PemeliharaanController extends Controller
 
             return redirect()->back()->with('success', 'Data pemeliharaan berhasil diupdate!');
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            return redirect()->back()
+                ->withErrors($e->errors())
+                ->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))
+                ->withInput();
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate data pemeliharaan.', [
                 'error_message' => $e->getMessage(),
@@ -175,6 +197,44 @@ class PemeliharaanController extends Controller
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    public function batal($id)
+    {
+        try {
+            $pemeliharaan = Pemeliharaan::findOrFail($id);
+
+            if ($pemeliharaan->status_pemeliharaan === 'Berjalan') {
+                $pemeliharaan->status_pemeliharaan = 'Dibatalkan';
+                $pemeliharaan->save();
+
+                if (strpos($pemeliharaan->nama_pemeliharaan, 'Ruangan - ') === 0) {
+                    $nama_ruangan = substr($pemeliharaan->nama_pemeliharaan, 10);
+                    Ruangan::where('nama_ruangan', $nama_ruangan)->update(['status_ruangan' => 'Tersedia']);
+                    Fasilitas::where('nama_fasilitas', $nama_ruangan)->where('jenis_fasilitas', 'Ruangan')->update(['status_fasilitas' => 'Tersedia']);
+                } else if (strpos($pemeliharaan->nama_pemeliharaan, 'Fasilitas - ') === 0) {
+                    $nama_fasilitas = substr($pemeliharaan->nama_pemeliharaan, 12);
+                    $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->first();
+                    if ($fasilitas) {
+                        $totalActive = Pemeliharaan::where('nama_pemeliharaan', $pemeliharaan->nama_pemeliharaan)
+                            ->where('status_pemeliharaan', 'Berjalan')
+                            ->sum('jumlah_pemeliharaan');
+                        
+                        if ($totalActive >= $fasilitas->jumlah_fasilitas) {
+                            $fasilitas->update(['status_fasilitas' => 'Pemeliharaan']);
+                        } else {
+                            $fasilitas->update(['status_fasilitas' => 'Tersedia']);
+                        }
+                    }
+                }
+
+                return redirect()->back()->with('success', 'Pemeliharaan berhasil dibatalkan.');
+            }
+
+            return redirect()->back()->with('error', 'Status pemeliharaan tidak dapat dibatalkan.');
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 

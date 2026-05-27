@@ -274,6 +274,19 @@ class PemesananController extends Controller
 
             // cek bentrok ruangan
             if ($request->id_ruangan) {
+                // ruangan yang sama tidak bisa dipilih sebagai fasilitas tambahan
+                if ($request->has('fasilitas')) {
+                    $room = Ruangan::find($request->id_ruangan);
+                    if ($room) {
+                        $corresponding_facility = Fasilitas::where('nama_fasilitas', $room->nama_ruangan)
+                            ->where('jenis_fasilitas', 'Ruangan')
+                            ->first();
+                        if ($corresponding_facility && in_array($corresponding_facility->id_fasilitas, $request->fasilitas)) {
+                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' tidak dapat dipilih sebagai fasilitas tambahan karena sudah menjadi ruangan utama.');
+                        }
+                    }
+                }
+
                 $isRoomBooked = Pemesanan::where('id_ruangan', $request->id_ruangan)
                     ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak'])
                     ->where(function ($query) use ($request) {
@@ -283,6 +296,26 @@ class PemesananController extends Controller
 
                 if ($isRoomBooked) {
                     throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
+                }
+
+                // cek ruangan sedang dipesan sebagai fasilitas di pemesanan lain atau tidak
+                $room = Ruangan::find($request->id_ruangan);
+                if ($room) {
+                    $corresponding_facility = Fasilitas::where('nama_fasilitas', $room->nama_ruangan)
+                        ->where('jenis_fasilitas', 'Ruangan')
+                        ->first();
+                    if ($corresponding_facility) {
+                        $isFacilityBooked = DetailFasilitas::where('id_fasilitas', $corresponding_facility->id_fasilitas)
+                            ->whereHas('pemesanan', function ($query) use ($request) {
+                                $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak'])
+                                    ->where('tgl_mulai', '<', $request->tgl_selesai)
+                                    ->where('tgl_selesai', '>', $request->tgl_mulai);
+                            })->exists();
+
+                        if ($isFacilityBooked) {
+                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' sedang dipesan sebagai fasilitas tambahan pada waktu tersebut.');
+                        }
+                    }
                 }
             }
 
@@ -302,6 +335,22 @@ class PemesananController extends Controller
                                         ->where('tgl_selesai', '>', $request->tgl_mulai);
                                 })->sum('jumlah_fasilitas');
 
+                            // cek fasilitas ruangan tidak sedang dibooking
+                            if ($facility->jenis_fasilitas === 'Ruangan') {
+                                $corresponding_room = Ruangan::where('nama_ruangan', $facility->nama_fasilitas)->first();
+                                if ($corresponding_room) {
+                                    $isRoomBookedDirectly = Pemesanan::where('id_ruangan', $corresponding_room->id_ruangan)
+                                        ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                                        ->where(function ($query) use ($request) {
+                                            $query->where('tgl_mulai', '<', $request->tgl_selesai)
+                                                ->where('tgl_selesai', '>', $request->tgl_mulai);
+                                        })->exists();
+                                    if ($isRoomBookedDirectly) {
+                                        $used_qty += 1;
+                                    }
+                                }
+                            }
+
                             $active_maintenance = Pemeliharaan::where('nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas)
                                 ->where('status_pemeliharaan', 'Berjalan')
                                 ->sum('jumlah_pemeliharaan');
@@ -309,7 +358,8 @@ class PemesananController extends Controller
                             $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
 
                             if ($requested_qty > $available_qty) {
-                                throw new Exception('Fasilitas ' . $facility->nama_fasilitas . ' tidak mencukupi. (Tersisa: ' . max(0, $available_qty) . ').');
+                                throw new Exception('Fasilitas ' . $facility->nama_fasilitas . 
+                                    ' tidak mencukupi. (Tersisa: ' . max(0, $available_qty) . ').');
                             }
                         }
                     }
@@ -362,11 +412,34 @@ class PemesananController extends Controller
                 Log::error('Gagal mengirim email notifikasi admin: ' . $e->getMessage());
             }
 
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Booking berhasil dikirim! Nota: ' . $pemesanan->no_nota
+                ]);
+            }
+
             return redirect()->back()->with('success', 'Booking berhasil dikirim! Nota: ' . $pemesanan->no_nota);
 
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => $e->validator->errors()->all(),
+                    'message' => 'Terjadi kesalahan validasi.'
+                ], 422);
+            }
+            return redirect()->back()->withInput()->withErrors($e->errors())->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()));
         } catch (Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terjadi kesalahan: ' . $e->getMessage()
+                ], 500);
+            }
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
 
@@ -382,14 +455,16 @@ class PemesananController extends Controller
                 $pemesanan->status_pemesanan = 'Ditolak';
             } elseif ($action === 'selesai') {
                 $pemesanan->status_pemesanan = 'Selesai';
+            } elseif ($action === 'batal') {
+                $pemesanan->status_pemesanan = 'Dibatalkan';
             }
 
             $pemesanan->save();
 
-            if (in_array($action, ['setuju', 'tolak'])) {
+            if (in_array($action, ['setuju', 'tolak', 'batal'])) {
                 try {
                     $pemesanan->load(['ruangan', 'detailF.fasilitas']);
-                    $statusMap = ['setuju' => 'Disetujui', 'tolak' => 'Ditolak'];
+                    $statusMap = ['setuju' => 'Disetujui', 'tolak' => 'Ditolak', 'batal' => 'Dibatalkan'];
                     $statusText = $statusMap[$action];
                     Mail::to($pemesanan->email_pemesan)->send(new CustomerStatusMail($pemesanan, $statusText));
                 } catch (Exception $e) {
@@ -439,6 +514,19 @@ class PemesananController extends Controller
             DB::beginTransaction();
 
             if ($request->id_ruangan) {
+                // cek ruangan yang sama tidak bisa dipilih sebagai fasilitas tambahan
+                if ($request->has('fasilitas')) {
+                    $room = Ruangan::find($request->id_ruangan);
+                    if ($room) {
+                        $corresponding_facility = Fasilitas::where('nama_fasilitas', $room->nama_ruangan)
+                            ->where('jenis_fasilitas', 'Ruangan')
+                            ->first();
+                        if ($corresponding_facility && in_array($corresponding_facility->id_fasilitas, $request->fasilitas)) {
+                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' tidak dapat dipilih sebagai fasilitas tambahan karena sudah menjadi ruangan utama.');
+                        }
+                    }
+                }
+
                 $isRoomBooked = Pemesanan::where('id_ruangan', $request->id_ruangan)
                     ->where('id_pemesanan', '!=', $id)
                     ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
@@ -450,6 +538,27 @@ class PemesananController extends Controller
                 if ($isRoomBooked) {
                     throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
                 }
+
+                // cek ruangan sedang dipesan sebagai fasilitas di pemesanan lain atau tidak
+                $room = Ruangan::find($request->id_ruangan);
+                if ($room) {
+                    $corresponding_facility = Fasilitas::where('nama_fasilitas', $room->nama_ruangan)
+                        ->where('jenis_fasilitas', 'Ruangan')
+                        ->first();
+                    if ($corresponding_facility) {
+                        $isFacilityBooked = DetailFasilitas::where('id_fasilitas', $corresponding_facility->id_fasilitas)
+                            ->where('id_pemesanan', '!=', $id)
+                            ->whereHas('pemesanan', function ($query) use ($request) {
+                                $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                                    ->where('tgl_mulai', '<', $request->tgl_selesai)
+                                    ->where('tgl_selesai', '>', $request->tgl_mulai);
+                            })->exists();
+
+                        if ($isFacilityBooked) {
+                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' sedang dipesan sebagai fasilitas tambahan pada waktu tersebut.');
+                        }
+                    }
+                }
             }
 
             if ($request->has('fasilitas')) {
@@ -458,7 +567,8 @@ class PemesananController extends Controller
                         $facility = Fasilitas::find($fasilitas_id);
                         if ($facility) {
                             $qty_input = $request->input('qty_fasilitas.' . $fasilitas_id);
-                            $requested_qty = ($facility->jumlah_fasilitas > 1 && $qty_input !== null && (int) $qty_input > 0) ? (int) $qty_input : 1;
+                            $requested_qty = ($facility->jumlah_fasilitas > 1 && $qty_input !== null 
+                                && (int) $qty_input > 0) ? (int) $qty_input : 1;
 
                             $used_qty = DetailFasilitas::where('id_fasilitas', $fasilitas_id)
                                 ->whereHas('pemesanan', function ($query) use ($request, $id) {
@@ -468,14 +578,33 @@ class PemesananController extends Controller
                                         ->where('tgl_selesai', '>', $request->tgl_mulai);
                                 })->sum('jumlah_fasilitas');
 
-                            $active_maintenance = Pemeliharaan::where('nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas)
+                            // cek fasilitas ruangan tidak sedang dibooking
+                            if ($facility->jenis_fasilitas === 'Ruangan') {
+                                $corresponding_room = Ruangan::where('nama_ruangan', $facility->nama_fasilitas)->first();
+                                if ($corresponding_room) {
+                                    $isRoomBookedDirectly = Pemesanan::where('id_ruangan', $corresponding_room->id_ruangan)
+                                        ->where('id_pemesanan', '!=', $id)
+                                        ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                                        ->where(function ($query) use ($request) {
+                                            $query->where('tgl_mulai', '<', $request->tgl_selesai)
+                                                ->where('tgl_selesai', '>', $request->tgl_mulai);
+                                        })->exists();
+                                    if ($isRoomBookedDirectly) {
+                                        $used_qty += 1;
+                                    }
+                                }
+                            }
+
+                            $active_maintenance = Pemeliharaan::where('nama_pemeliharaan', 'Fasilitas - ' 
+                                . $facility->nama_fasilitas)
                                 ->where('status_pemeliharaan', 'Berjalan')
                                 ->sum('jumlah_pemeliharaan');
 
                             $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
 
                             if ($requested_qty > $available_qty) {
-                                throw new Exception('Fasilitas ' . $facility->nama_fasilitas . ' tidak mencukupi. (Tersedia: ' . max(0, $available_qty) . ').');
+                                throw new Exception('Fasilitas ' . $facility->nama_fasilitas . 
+                                    ' tidak mencukupi. (Tersedia: ' . max(0, $available_qty) . ').');
                             }
                         }
                     }
@@ -525,9 +654,12 @@ class PemesananController extends Controller
 
             DB::commit();
             return redirect()->back()->with('success', 'Data pemesanan berhasil diperbarui!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
+            return redirect()->back()->withInput()->withErrors($e->errors())->with('error', 'Terjadi kesalahan validasi: ' . implode(', ', $e->validator->errors()->all()))->with('failed_booking_id', $id);
         } catch (Exception $e) {
             DB::rollBack();
-            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->back()->withInput()->with('error', 'Terjadi kesalahan: ' . $e->getMessage())->with('failed_booking_id', $id);
         }
     }
 
@@ -612,7 +744,7 @@ class PemesananController extends Controller
         $pemesanan = Pemesanan::with(['ruangan', 'detailF.fasilitas'])
             ->whereMonth('tgl_mulai', $bulan)
             ->whereYear('tgl_mulai', $tahun)
-            ->whereIn('status_pemesanan', ['Disetujui', 'Selesai'])
+            ->whereIn('status_pemesanan', ['Disetujui', 'Ditolak', 'Dibatalkan', 'Selesai'])
             ->get();
 
         $mahacitta = $pemesanan->filter(function ($item) {
