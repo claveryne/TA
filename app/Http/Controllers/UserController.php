@@ -16,7 +16,7 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'    => 'required|max:255',
-                'phone'   => 'required|max:15',
+                'phone'   => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
                 'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
             ]);
@@ -69,8 +69,8 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'    => 'required|max:255',
-                'email'   => 'required|max:255',
-                'phone'   => 'required|max:15',
+                'email'   => 'required|email|unique:users,email|max:255',
+                'phone'   => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
                 'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'role'    => 'required|max:10',
@@ -149,8 +149,8 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'    => 'required|max:255',
-                'email'   => 'required|max:255',
-                'phone'   => 'required|max:15',
+                'email'   => 'required|email|max:255|unique:users,email,' . $id,
+                'phone'   => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
                 'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'role'    => 'required|max:10',
@@ -302,8 +302,8 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'    => 'required|max:255',
-                'email'   => 'required|max:255',
-                'phone'   => 'required|max:15',
+                'email'   => 'required|email|unique:users,email|max:255',
+                'phone'   => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
                 'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'role'    => 'nullable|max:10',
@@ -360,6 +360,7 @@ class UserController extends Controller
         $search = $request->input('search');
 
         $pelanggan = User::whereNull('role')
+        ->where('status', 'Aktif')
         ->when($search, function($query, $search) {
             $query->where(function($q) use ($search) {
                 $q->where('name', 'like', "%{$search}%")
@@ -378,8 +379,8 @@ class UserController extends Controller
         try {
             $request->validate([
                 'name'    => 'required|max:255',
-                'email'   => 'required|max:255',
-                'phone'   => 'required|max:15',
+                'email'   => 'required|email|max:255|unique:users,email,' . $id,
+                'phone'   => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
                 'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'role'    => 'nullable|max:10',

@@ -245,7 +245,7 @@ class PemesananController extends Controller
         try {
             $request->validate([
                 'nama_pemesan' => 'required|string|max:255',
-                'telp_pemesan' => 'required|string|max:15',
+                'telp_pemesan' => 'required|numeric|digits_between:10,15',
                 'email_pemesan' => 'required|email|max:255',
                 'nama_acara' => 'required|string|max:255',
                 'alamat_pemesan' => 'required|string|max:255',
@@ -485,7 +485,7 @@ class PemesananController extends Controller
 
             $request->validate([
                 'nama_pemesan' => 'required|string|max:255',
-                'telp_pemesan' => 'required|string|max:15',
+                'telp_pemesan' => 'required|numeric|digits_between:10,15',
                 'email_pemesan' => 'required|email|max:255',
                 'nama_acara' => 'required|string|max:255',
                 'alamat_pemesan' => 'required|string|max:255',
