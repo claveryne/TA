@@ -277,110 +277,8 @@ class PemesananController extends Controller
             Log::info('Mencoba menambahkan data pemesanan baru: ' . $request->nama_pemesan);
             DB::beginTransaction();
 
-            // cek bentrok ruangan
-            if ($request->id_ruangan) {
-                // ruangan yang sama tidak bisa dipilih sebagai fasilitas tambahan
-                if ($request->has('fasilitas')) {
-                    $room = Ruangan::find($request->id_ruangan);
-                    if ($room) {
-                        $corresponding_facility = Fasilitas::where([
-                            ['nama_fasilitas', $room->nama_ruangan],
-                            ['jenis_fasilitas', 'Ruangan']
-                        ])->first();
-                        if ($corresponding_facility && in_array($corresponding_facility->id_fasilitas, $request->fasilitas)) {
-                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' tidak dapat dipilih sebagai fasilitas tambahan karena sudah menjadi ruangan utama.');
-                        }
-                    }
-                }
-
-                $isRoomBooked = Pemesanan::where(['id_ruangan' => $request->id_ruangan])
-                    ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak'])
-                    ->where(function ($query) use ($request) {
-                        $query->where([
-                            ['tgl_mulai', '<', $request->tgl_selesai],
-                            ['tgl_selesai', '>', $request->tgl_mulai]
-                        ]);
-                    })->exists();
-
-                if ($isRoomBooked) {
-                    throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
-                }
-
-                // cek ruangan sedang dipesan sebagai fasilitas di pemesanan lain atau tidak
-                $room = Ruangan::find($request->id_ruangan);
-                if ($room) {
-                    $corresponding_facility = Fasilitas::where([
-                        ['nama_fasilitas', $room->nama_ruangan],
-                        ['jenis_fasilitas', 'Ruangan']
-                    ])->first();
-                    if ($corresponding_facility) {
-                        $isFacilityBooked = DetailFasilitas::where(['id_fasilitas' => $corresponding_facility->id_fasilitas])
-                            ->whereHas('pemesanan', function ($query) use ($request) {
-                                $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak'])
-                                    ->where([
-                                        ['tgl_mulai', '<', $request->tgl_selesai],
-                                        ['tgl_selesai', '>', $request->tgl_mulai]
-                                    ]);
-                            })->exists();
-
-                        if ($isFacilityBooked) {
-                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' sedang dipesan sebagai fasilitas tambahan pada waktu tersebut.');
-                        }
-                    }
-                }
-            }
-
-            // cek bentrok fasilitas
-            if ($request->has('fasilitas')) {
-                foreach ($request->fasilitas as $fasilitas_id) {
-                    if (is_numeric($fasilitas_id)) {
-                        $facility = Fasilitas::find($fasilitas_id);
-                        if ($facility) {
-                            $qty_input = $request->input('qty_fasilitas.' . $fasilitas_id);
-                            $requested_qty = ($facility->jumlah_fasilitas > 1 && $qty_input !== null && (int) $qty_input > 0) ? (int) $qty_input : 1;
-
-                            $used_qty = DetailFasilitas::where(['id_fasilitas' => $fasilitas_id])
-                                ->whereHas('pemesanan', function ($query) use ($request) {
-                                    $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                        ->where([
-                                            ['tgl_mulai', '<', $request->tgl_selesai],
-                                            ['tgl_selesai', '>', $request->tgl_mulai]
-                                        ]);
-                                })->sum('jumlah_fasilitas');
-
-                            // cek fasilitas ruangan tidak sedang dibooking
-                            if ($facility->jenis_fasilitas === 'Ruangan') {
-                                $corresponding_room = Ruangan::where(['nama_ruangan' => $facility->nama_fasilitas])->first();
-                                if ($corresponding_room) {
-                                    $isRoomBookedDirectly = Pemesanan::where(['id_ruangan' => $corresponding_room->id_ruangan])
-                                        ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                        ->where(function ($query) use ($request) {
-                                            $query->where([
-                                                ['tgl_mulai', '<', $request->tgl_selesai],
-                                                ['tgl_selesai', '>', $request->tgl_mulai]
-                                            ]);
-                                        })->exists();
-                                    if ($isRoomBookedDirectly) {
-                                        $used_qty += 1;
-                                    }
-                                }
-                            }
-
-                            $active_maintenance = Pemeliharaan::where([
-                                ['nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas],
-                                ['status_pemeliharaan', 'Berjalan']
-                            ])->sum('jumlah_pemeliharaan');
-
-                            $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
-
-                            if ($requested_qty > $available_qty) {
-                                throw new Exception('Fasilitas ' . $facility->nama_fasilitas . 
-                                    ' tidak mencukupi. (Tersisa: ' . max(0, $available_qty) . ').');
-                            }
-                        }
-                    }
-                }
-            }
+            // Cek bentrok menggunakan helper method
+            $this->checkBookingConflicts($request);
 
             $pemesanan = Pemesanan::create([
                 'no_nota' => 'INV-' . strtoupper(Str::random(8)),
@@ -494,6 +392,146 @@ class PemesananController extends Controller
         }
     }
 
+    public function destroy($id)
+    {
+        try {
+            $pemesanan = Pemesanan::findOrFail($id);
+            $pemesanan->status_pemesanan = 'Ditolak';
+            $pemesanan->save();
+
+            return redirect()->back()->with('success', 'Pemesanan berhasil ditolak / dihapus.');
+        } catch (Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan: ' . $e->getMessage());
+        }
+    }
+
+    private function checkBookingConflicts(Request $request, $ignorePemesananId = null)
+    {
+        // cek bentrok ruangan
+        if ($request->id_ruangan) {
+            // ruangan yang sama tidak bisa dipilih sebagai fasilitas tambahan
+            if ($request->has('fasilitas')) {
+                $room = Ruangan::find($request->id_ruangan);
+                if ($room) {
+                    $corresponding_facility = Fasilitas::where([
+                        ['nama_fasilitas', $room->nama_ruangan],
+                        ['jenis_fasilitas', 'Ruangan']
+                    ])->first();
+                    if ($corresponding_facility && in_array($corresponding_facility->id_fasilitas, $request->fasilitas)) {
+                        throw new Exception('Ruangan ' . $room->nama_ruangan . ' tidak dapat dipilih sebagai fasilitas tambahan karena sudah menjadi ruangan utama.');
+                    }
+                }
+            }
+
+            $isRoomBookedQuery = Pemesanan::where(['id_ruangan' => $request->id_ruangan])
+                ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                ->where(function ($query) use ($request) {
+                    $query->where([
+                        ['tgl_mulai', '<', $request->tgl_selesai],
+                        ['tgl_selesai', '>', $request->tgl_mulai]
+                    ]);
+                });
+
+            if ($ignorePemesananId) {
+                $isRoomBookedQuery->where('id_pemesanan', '!=', $ignorePemesananId);
+            }
+
+            if ($isRoomBookedQuery->exists()) {
+                throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
+            }
+
+            // cek ruangan sedang dipesan sebagai fasilitas di pemesanan lain atau tidak
+            $room = Ruangan::find($request->id_ruangan);
+            if ($room) {
+                $corresponding_facility = Fasilitas::where([
+                    ['nama_fasilitas', $room->nama_ruangan],
+                    ['jenis_fasilitas', 'Ruangan']
+                ])->first();
+                if ($corresponding_facility) {
+                    $isFacilityBookedQuery = DetailFasilitas::where(['id_fasilitas' => $corresponding_facility->id_fasilitas])
+                        ->whereHas('pemesanan', function ($query) use ($request, $ignorePemesananId) {
+                            $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                                ->where([
+                                    ['tgl_mulai', '<', $request->tgl_selesai],
+                                    ['tgl_selesai', '>', $request->tgl_mulai]
+                                ]);
+                            if ($ignorePemesananId) {
+                                $query->where('id_pemesanan', '!=', $ignorePemesananId);
+                            }
+                        });
+
+                    if ($ignorePemesananId) {
+                        $isFacilityBookedQuery->where('id_pemesanan', '!=', $ignorePemesananId);
+                    }
+
+                    if ($isFacilityBookedQuery->exists()) {
+                        throw new Exception('Ruangan ' . $room->nama_ruangan . ' sedang dipesan sebagai fasilitas tambahan pada waktu tersebut.');
+                    }
+                }
+            }
+        }
+
+        // cek bentrok fasilitas
+        if ($request->has('fasilitas')) {
+            foreach ($request->fasilitas as $fasilitas_id) {
+                if (is_numeric($fasilitas_id)) {
+                    $facility = Fasilitas::find($fasilitas_id);
+                    if ($facility) {
+                        $qty_input = $request->input('qty_fasilitas.' . $fasilitas_id);
+                        $requested_qty = ($facility->jumlah_fasilitas > 1 && $qty_input !== null && (int) $qty_input > 0) ? (int) $qty_input : 1;
+
+                        $used_qty = DetailFasilitas::where(['id_fasilitas' => $fasilitas_id])
+                            ->whereHas('pemesanan', function ($query) use ($request, $ignorePemesananId) {
+                                $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                                    ->where([
+                                        ['tgl_mulai', '<', $request->tgl_selesai],
+                                        ['tgl_selesai', '>', $request->tgl_mulai]
+                                    ]);
+                                if ($ignorePemesananId) {
+                                    $query->where('id_pemesanan', '!=', $ignorePemesananId);
+                                }
+                            })->sum('jumlah_fasilitas');
+
+                        // cek fasilitas ruangan tidak sedang dibooking
+                        if ($facility->jenis_fasilitas === 'Ruangan') {
+                            $corresponding_room = Ruangan::where(['nama_ruangan' => $facility->nama_fasilitas])->first();
+                            if ($corresponding_room) {
+                                $isRoomBookedDirectlyQuery = Pemesanan::where(['id_ruangan' => $corresponding_room->id_ruangan])
+                                    ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
+                                    ->where(function ($query) use ($request) {
+                                        $query->where([
+                                            ['tgl_mulai', '<', $request->tgl_selesai],
+                                            ['tgl_selesai', '>', $request->tgl_mulai]
+                                        ]);
+                                    });
+
+                                if ($ignorePemesananId) {
+                                    $isRoomBookedDirectlyQuery->where('id_pemesanan', '!=', $ignorePemesananId);
+                                }
+
+                                if ($isRoomBookedDirectlyQuery->exists()) {
+                                    $used_qty += 1;
+                                }
+                            }
+                        }
+
+                        $active_maintenance = Pemeliharaan::where([
+                            ['nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas],
+                            ['status_pemeliharaan', 'Berjalan']
+                        ])->sum('jumlah_pemeliharaan');
+
+                        $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
+
+                        if ($requested_qty > $available_qty) {
+                            throw new Exception('Fasilitas ' . $facility->nama_fasilitas . 
+                                ' tidak mencukupi. (Tersedia: ' . max(0, $available_qty) . ').');
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     public function edit(Request $request, $id)
     {
         try {
@@ -529,113 +567,8 @@ class PemesananController extends Controller
 
             DB::beginTransaction();
 
-            if ($request->id_ruangan) {
-                // cek ruangan yang sama tidak bisa dipilih sebagai fasilitas tambahan
-                if ($request->has('fasilitas')) {
-                    $room = Ruangan::find($request->id_ruangan);
-                    if ($room) {
-                        $corresponding_facility = Fasilitas::where([
-                            ['nama_fasilitas', $room->nama_ruangan],
-                            ['jenis_fasilitas', 'Ruangan']
-                        ])->first();
-                        if ($corresponding_facility && in_array($corresponding_facility->id_fasilitas, $request->fasilitas)) {
-                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' tidak dapat dipilih sebagai fasilitas tambahan karena sudah menjadi ruangan utama.');
-                        }
-                    }
-                }
-
-                $isRoomBooked = Pemesanan::where(['id_ruangan' => $request->id_ruangan])
-                    ->where([['id_pemesanan', '!=', $id]])
-                    ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                    ->where(function ($query) use ($request) {
-                        $query->where([
-                            ['tgl_mulai', '<', $request->tgl_selesai],
-                            ['tgl_selesai', '>', $request->tgl_mulai]
-                        ]);
-                    })->exists();
-
-                if ($isRoomBooked) {
-                    throw new Exception('Ruangan sudah dipesan pada waktu tersebut.');
-                }
-
-                // cek ruangan sedang dipesan sebagai fasilitas di pemesanan lain atau tidak
-                $room = Ruangan::find($request->id_ruangan);
-                if ($room) {
-                    $corresponding_facility = Fasilitas::where([
-                        ['nama_fasilitas', $room->nama_ruangan],
-                        ['jenis_fasilitas', 'Ruangan']
-                    ])->first();
-                    if ($corresponding_facility) {
-                        $isFacilityBooked = DetailFasilitas::where(['id_fasilitas' => $corresponding_facility->id_fasilitas])
-                            ->where([['id_pemesanan', '!=', $id]])
-                            ->whereHas('pemesanan', function ($query) use ($request) {
-                                $query->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                    ->where([
-                                        ['tgl_mulai', '<', $request->tgl_selesai],
-                                        ['tgl_selesai', '>', $request->tgl_mulai]
-                                    ]);
-                            })->exists();
-
-                        if ($isFacilityBooked) {
-                            throw new Exception('Ruangan ' . $room->nama_ruangan . ' sedang dipesan sebagai fasilitas tambahan pada waktu tersebut.');
-                        }
-                    }
-                }
-            }
-
-            if ($request->has('fasilitas')) {
-                foreach ($request->fasilitas as $fasilitas_id) {
-                    if (is_numeric($fasilitas_id)) {
-                        $facility = Fasilitas::find($fasilitas_id);
-                        if ($facility) {
-                            $qty_input = $request->input('qty_fasilitas.' . $fasilitas_id);
-                            $requested_qty = ($facility->jumlah_fasilitas > 1 && $qty_input !== null 
-                                && (int) $qty_input > 0) ? (int) $qty_input : 1;
-
-                            $used_qty = DetailFasilitas::where(['id_fasilitas' => $fasilitas_id])
-                                ->whereHas('pemesanan', function ($query) use ($request, $id) {
-                                    $query->where([['id_pemesanan', '!=', $id]])
-                                        ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                        ->where([
-                                            ['tgl_mulai', '<', $request->tgl_selesai],
-                                            ['tgl_selesai', '>', $request->tgl_mulai]
-                                        ]);
-                                })->sum('jumlah_fasilitas');
-
-                            // cek fasilitas ruangan tidak sedang dibooking
-                            if ($facility->jenis_fasilitas === 'Ruangan') {
-                                $corresponding_room = Ruangan::where(['nama_ruangan' => $facility->nama_fasilitas])->first();
-                                if ($corresponding_room) {
-                                    $isRoomBookedDirectly = Pemesanan::where(['id_ruangan' => $corresponding_room->id_ruangan])
-                                        ->where([['id_pemesanan', '!=', $id]])
-                                        ->whereNotIn('status_pemesanan', ['Dibatalkan', 'Ditolak', 'Selesai'])
-                                        ->where(function ($query) use ($request) {
-                                            $query->where([
-                                                ['tgl_mulai', '<', $request->tgl_selesai],
-                                                ['tgl_selesai', '>', $request->tgl_mulai]
-                                            ]);
-                                        })->exists();
-                                    if ($isRoomBookedDirectly) {
-                                        $used_qty += 1;
-                                    }
-                                }
-                            }
-
-                            $active_maintenance = Pemeliharaan::where([
-                                ['nama_pemeliharaan', 'Fasilitas - ' . $facility->nama_fasilitas],
-                                ['status_pemeliharaan', 'Berjalan']
-                            ])->sum('jumlah_pemeliharaan');
-
-                            $available_qty = $facility->jumlah_fasilitas - $used_qty - $active_maintenance;
-
-                            if ($requested_qty > $available_qty) {
-                                throw new Exception('Fasilitas ' . $facility->nama_fasilitas . 
-                                    ' tidak mencukupi. (Tersedia: ' . max(0, $available_qty) . ').');
-                            }
-                        }
-                    }
-                }
-            }
+            // Cek bentrok menggunakan helper method
+            $this->checkBookingConflicts($request, $id);
 
             $fileName = $pemesanan->bukti_pemesanan;
             if ($request->hasFile('bukti_pemesanan')) {
