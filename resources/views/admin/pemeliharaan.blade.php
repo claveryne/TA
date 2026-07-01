@@ -268,7 +268,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Jumlah</label>
-                            <input type="number" name="jumlah_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 10">
+                            <input type="number" name="jumlah_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 10" min="1">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Tanggal Mulai<span style="color: red;">*</span></label>
@@ -298,7 +298,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Biaya</label>
-                            <input type="number" name="biaya_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 100000">
+                            <input type="number" name="biaya_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 100000" min="0">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Bukti Pemeliharaan</label>
@@ -355,7 +355,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Jumlah</label>
-                            <input type="number" name="jumlah_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 10">
+                            <input type="number" name="jumlah_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 10" min="1">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Tanggal Mulai<span style="color: red;">*</span></label>
@@ -385,7 +385,7 @@
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Biaya</label>
-                            <input type="number" name="biaya_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 100000">
+                            <input type="number" name="biaya_pemeliharaan" class="form-control custom-input" placeholder="Contoh: 100000" min="0">
                         </div>
                         <div class="col-md-6">
                             <label class="form-label fw-600">Bukti Pemeliharaan <a href="javascript:void(0)" id="linkPreviewFotoPemeliharaan" class="text-secondary text-decoration-underline ms-2" style="font-size: 0.85rem; display: none;">Lihat Foto</a></label>

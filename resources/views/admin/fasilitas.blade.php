@@ -361,7 +361,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Jumlah Unit<span style="color: red;">*</span></label>
-                                <input type="number" name="jumlah_fasilitas" class="form-control custom-input"
+                                <input type="number" name="jumlah_fasilitas" class="form-control custom-input" min="1"
                                     placeholder="Contoh: 20" required>
                             </div>
                             <div class="col-md-6">
@@ -443,7 +443,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Jumlah Unit<span style="color: red;">*</span></label>
-                                <input type="number" name="jumlah_fasilitas" class="form-control custom-input" required>
+                                <input type="number" name="jumlah_fasilitas" class="form-control custom-input" min="1" required>
                                 <div id="pemeliharaanInfoText" style="font-size: 13px; color:#994D1C; font-weight: 600;">
                                 </div>
                             </div>
@@ -646,16 +646,16 @@
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-600">Ukuran (cm)<span style="color: red;">*</span></label>
-                    <input type="number" step="any" name="ukuranU" class="form-control custom-input" value="${data.ukuranU || ''}" placeholder="Ukuran" required>
+                    <input type="number" step="any" name="ukuranU" class="form-control custom-input" value="${data.ukuranU || ''}" placeholder="Ukuran" min="0" required>
                 </div>`;
             } else if (jenis === 'Ruangan') {
                 html += `<div class="col-md-6">
                     <label class="form-label fw-600">Ukuran (m²)<span style="color: red;">*</span></label>
-                    <input type="number" step="any" name="ukuranR" class="form-control custom-input" value="${data.ukuranR || ''}" placeholder="Ukuran ruangan" required>
+                    <input type="number" step="any" name="ukuranR" class="form-control custom-input" value="${data.ukuranR || ''}" placeholder="Ukuran ruangan" min="0" required>
                 </div>
                 <div class="col-md-6">
                     <label class="form-label fw-600">Kapasitas (orang)<span style="color: red;">*</span></label>
-                    <input type="number" name="kapasitasR" class="form-control custom-input" value="${data.kapasitasR || ''}" placeholder="Kapasitas ruangan" required>
+                    <input type="number" name="kapasitasR" class="form-control custom-input" value="${data.kapasitasR || ''}" placeholder="Kapasitas ruangan" min="1" required>
                 </div>`;
             } else {
                 container.style.display = 'none';

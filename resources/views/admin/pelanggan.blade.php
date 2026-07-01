@@ -293,8 +293,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Telepon<span style="color: red;">*</span></label>
-                                <input type="text" name="phone" class="form-control custom-input"
-                                    placeholder="Contoh: 08123456789" required>
+                                <input type="text" name="phone" class="form-control custom-input" placeholder="Contoh: 08123456789" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             <div class="col-12">
                                 <label class="form-label fw-600">Alamat<span style="color: red;">*</span></label>
@@ -351,7 +350,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Telepon<span style="color: red;">*</span></label>
-                                <input type="text" name="phone" class="form-control custom-input" required>
+                                <input type="text" name="phone" class="form-control custom-input" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                             </div>
                             <div class="col-md-6">
                                 <label class="form-label fw-600">Status<span style="color: red;">*</span></label>

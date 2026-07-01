@@ -21,7 +21,7 @@ class FasilitasController extends Controller
             $request->validate([
                 'nama_fasilitas' => 'required|max:255',
                 'jenis_fasilitas' => 'required|max:20',
-                'jumlah_fasilitas' => 'required|integer',
+                'jumlah_fasilitas' => 'required|integer|min:1',
                 'merk_fasilitas' => 'required|max:255',
                 'foto_fasilitas' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'keterangan_fasilitas' => 'nullable|max:255',
@@ -32,9 +32,9 @@ class FasilitasController extends Controller
                 'warnaL' => 'nullable|string|max:255',
                 'warnaM' => 'nullable|string|max:255',
                 'warnaU' => 'nullable|string|max:255',
-                'ukuranU' => 'nullable|numeric',
-                'ukuranR' => 'nullable|numeric',
-                'kapasitasR' => 'nullable|integer',
+                'ukuranU' => 'nullable|numeric|min:0',
+                'ukuranR' => 'nullable|numeric|min:0',
+                'kapasitasR' => 'nullable|integer|min:1',
             ]);
 
         
@@ -133,7 +133,7 @@ class FasilitasController extends Controller
             $request->validate([
                 'nama_fasilitas' => 'required|max:255',
                 'jenis_fasilitas' => 'required|max:20',
-                'jumlah_fasilitas' => 'required|integer',
+                'jumlah_fasilitas' => 'required|integer|min:1',
                 'merk_fasilitas' => 'required|max:255',
                 'foto_fasilitas' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
                 'keterangan_fasilitas' => 'nullable|max:255',
@@ -144,9 +144,9 @@ class FasilitasController extends Controller
                 'warnaL' => 'nullable|string|max:255',
                 'warnaM' => 'nullable|string|max:255',
                 'warnaU' => 'nullable|string|max:255',
-                'ukuranU' => 'nullable|numeric',
-                'ukuranR' => 'nullable|numeric',
-                'kapasitasR' => 'nullable|integer',
+                'ukuranU' => 'nullable|numeric|min:0',
+                'ukuranR' => 'nullable|numeric|min:0',
+                'kapasitasR' => 'nullable|integer|min:1',
             ]);
 
             Log::info('Mencoba mengupdate data fasilitas: ' . $request->nama_fasilitas);

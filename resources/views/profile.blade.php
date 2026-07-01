@@ -90,19 +90,19 @@
         }
 
         .logout-btn {
-            background-color: #dc3545;
-            color: white;
-            border: none;
+            background-color: transparent;
+            color: #dc3545;
+            border: 2px solid #dc3545;
             border-radius: 12px;
-            padding: 14px 28px;
+            padding: 12px 26px;
             font-weight: 600;
             font-size: 1rem;
             transition: all 0.3s ease;
-            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.2);
+            box-shadow: 0 8px 20px rgba(220, 53, 69, 0.15);
         }
 
         .logout-btn:hover {
-            background-color: #c82333;
+            background-color: #dc3545;
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 12px 25px rgba(220, 53, 69, 0.3);
@@ -188,9 +188,12 @@
                             </div>
                         </div>
 
-                        <small class="mb-4 text-muted d-flex justify-content-center">
-                            Mohon cek <strong class="ms-1 me-1">notifikasi email</strong> untuk update status booking Anda.
-                        </small>
+                        <div class="alert alert-warning d-flex align-items-center mb-4" role="alert" style="border-radius: 12px; border: 1px solid #ffeeba;">
+                            <i class="fa-solid fa-triangle-exclamation flex-shrink-0 me-3" style="font-size: 1.5rem;"></i>
+                            <div>
+                                Mohon lengkapi <strong>Nomor Telepon</strong> aktif Anda sebelum melakukan pemesanan.
+                            </div>
+                        </div>
 
                         <div class="row mt-2 g-3 justify-content-center">
                             <div class="col-12 col-md">
@@ -255,7 +258,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="phone" class="form-label fw-bold">Nomor Telepon<span style="color: red;">*</span></label>
-                            <input type="text" class="form-control" id="phone" name="phone" value="{{ Auth::user()->phone }}" required>
+                            <input type="text" class="form-control" id="phone" name="phone" value="{{ Auth::user()->phone }}" oninput="this.value = this.value.replace(/[^0-9]/g, '');" required>
                         </div>
                         <div class="mb-1">
                             <label for="address" class="form-label fw-bold">Alamat Domisili<span style="color: red;">*</span></label>

@@ -42,8 +42,8 @@ class PemeliharaanController extends Controller
             $request->validate([
                 'nama_pemeliharaan'       => 'required|max:255',
                 'jenis_pemeliharaan'      => 'required|max:255',
-                'biaya_pemeliharaan'      => 'nullable|numeric',
-                'jumlah_pemeliharaan'     => 'nullable|integer',
+                'biaya_pemeliharaan'      => 'nullable|numeric|min:0',
+                'jumlah_pemeliharaan'     => 'nullable|integer|min:1',
                 'status_pemeliharaan'     => 'required|max:20',
                 'tglMulai_pemeliharaan'   => 'required|date',
                 'tglSelesai_pemeliharaan' => 'nullable|date|after_or_equal:tglMulai_pemeliharaan',
@@ -123,8 +123,8 @@ class PemeliharaanController extends Controller
             $request->validate([
                 'nama_pemeliharaan'       => 'required|max:255',
                 'jenis_pemeliharaan'      => 'required|max:255',
-                'biaya_pemeliharaan'      => 'nullable|numeric',
-                'jumlah_pemeliharaan'     => 'nullable|integer',
+                'biaya_pemeliharaan'      => 'nullable|numeric|min:0',
+                'jumlah_pemeliharaan'     => 'nullable|integer|min:1',
                 'status_pemeliharaan'     => 'required|max:20',
                 'tglMulai_pemeliharaan'   => 'required|date',
                 'tglSelesai_pemeliharaan' => 'nullable|date|after_or_equal:tglMulai_pemeliharaan',

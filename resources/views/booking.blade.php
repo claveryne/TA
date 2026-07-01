@@ -93,28 +93,42 @@
         display: none;
     }
     .facility-pill {
-        display: inline-block;
+        display: flex;
+        align-items: center;
         background-color: #FDF9F5;
-        border: 1px solid rgba(107, 36, 13, 0.1);
+        border: 1px solid rgba(107, 36, 13, 0.2);
         color: var(--color-primary);
-        padding: 10px 18px;
-        border-radius: 50px;
-        font-size: 0.85rem;
-        font-weight: 500;
+        padding: 12px 20px;
+        border-radius: 12px;
+        font-size: 0.95rem;
+        font-weight: 600;
         cursor: pointer;
         transition: all 0.3s ease;
         user-select: none;
+        box-shadow: 0 4px 10px rgba(107, 36, 13, 0.05);
     }
     .facility-checkbox:checked + .facility-pill {
-        background-color: var(--color-primary);
+        background: linear-gradient(135deg, var(--color-primary), #4A1707);
         color: var(--color-light);
-        border-color: var(--color-primary);
-        box-shadow: 0 4px 10px rgba(107, 36, 13, 0.2);
+        border-color: transparent;
+        box-shadow: 0 8px 20px rgba(107, 36, 13, 0.2);
         transform: translateY(-2px);
     }
     .facility-pill:hover {
-        border-color: var(--color-secondary);
+        border-color: var(--color-primary);
         background-color: #ffffff;
+        transform: translateY(-2px);
+        box-shadow: 0 8px 15px rgba(107, 36, 13, 0.1);
+    }
+    .facility-checkbox:disabled + .facility-pill {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
+        background: #eaeaea;
+        color: #888;
+        border-color: rgba(107, 36, 13, 0.1);
+        box-shadow: none;
+        transform: none;
     }
 
     .modern-calendar-box {
@@ -377,7 +391,12 @@
                 const children = document.querySelectorAll(targetSelector);
                 
                 children.forEach(function(child) {
-                    child.checked = isChecked;
+                    const row = child.closest('.facility-item-row') || child.closest('.form-check');
+                    if (row && window.getComputedStyle(row).display === 'none') {
+                        child.checked = false;
+                    } else {
+                        child.checked = isChecked;
+                    }
                 });
             });
         });
@@ -479,6 +498,16 @@
 
             const groupContainer = form.querySelector('#group-facility-ruangan');
             if (!groupContainer) return;
+
+            const parentCheckbox = groupContainer.querySelector('.parent-checkbox');
+            if (parentCheckbox) {
+                if (selectedRoomName.includes('vyria') || selectedRoomName.includes('vilasita') || selectedRoomName.includes('villasita')) {
+                    parentCheckbox.disabled = true;
+                    parentCheckbox.checked = false;
+                } else {
+                    parentCheckbox.disabled = false;
+                }
+            }
 
             const itemRows = groupContainer.querySelectorAll('.facility-item-row');
             
