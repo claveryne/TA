@@ -277,7 +277,7 @@ class PemesananController extends Controller
             Log::info('Mencoba menambahkan data pemesanan baru: ' . $request->nama_pemesan);
             DB::beginTransaction();
 
-            // Cek bentrok menggunakan helper method
+            // cek bentrok menggunakan helper method
             $this->checkBookingConflicts($request);
 
             $pemesanan = Pemesanan::create([
