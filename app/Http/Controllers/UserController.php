@@ -15,10 +15,10 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'name'    => 'required|max:255',
-                'phone'   => 'required|numeric|digits_between:10,15',
+                'name' => 'required|max:255',
+                'phone' => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
-                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'avatar' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
             ]);
 
             $user = auth()->user();
@@ -35,11 +35,11 @@ class UserController extends Controller
                 $file->move(public_path('uploads/user'), $fileName);
             }
 
-            User::where('id', $user->id)->update([
-                'name'    => $request->name,
-                'phone'   => $request->phone,
+            $user->update([
+                'name' => $request->name,
+                'phone' => $request->phone,
                 'address' => $request->address,
-                'avatar'  => $fileName,
+                'avatar' => $fileName,
             ]);
 
             Log::info('Profile pengguna berhasil diupdate.', [
@@ -68,13 +68,13 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'name'    => 'required|max:255',
-                'email'   => 'required|email|unique:users,email|max:255',
-                'phone'   => 'required|numeric|digits_between:10,15',
+                'name' => 'required|max:255',
+                'email' => 'required|email|unique:users,email|max:255',
+                'phone' => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
-                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
-                'role'    => 'required|max:10',
-                'status'  => 'required|max:20',
+                'avatar' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'role' => 'required|max:10',
+                'status' => 'required|max:20',
                 'password' => 'nullable|min:8|confirmed',
             ]);
 
@@ -88,18 +88,18 @@ class UserController extends Controller
             }
 
             $user = User::create([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'phone'     => $request->phone,
-                'address'   => $request->address,
-                'avatar'    => $fileName,
-                'role'      => $request->role,
-                'status'    => $request->status,
-                'password'  => $request->password ? bcrypt($request->password) : null,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'avatar' => $fileName,
+                'role' => $request->role,
+                'status' => $request->status,
+                'password' => $request->password ? bcrypt($request->password) : null,
             ]);
 
             Log::info('Data karyawan berhasil ditambahkan.', [
-                'id'   => $user->id,
+                'id' => $user->id,
                 'name' => $user->name,
             ]);
 
@@ -113,12 +113,12 @@ class UserController extends Controller
         } catch (Exception $e) {
             Log::error('GAGAL menambahkan data karyawan.', [
                 'error_message' => $e->getMessage(),
-                'user_input'    => $request->except('avatar'),
+                'user_input' => $request->except('avatar'),
             ]);
 
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())
-                ->withInput(); 
+                ->withInput();
         }
     }
 
@@ -126,18 +126,18 @@ class UserController extends Controller
     {
         $search = $request->input('search');
 
-        $karyawan = User::where('status', 'Aktif')
-        ->whereNotNull('role')
-        ->when($search, function($query, $search) {
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%")
-                  ->orWhere('role', 'like', "%{$search}%")
-                  ->orWhere('status', 'like', "%{$search}%");
-            });
-        })->get();
+        $karyawan = User::query()->where(['status' => 'Aktif'])
+            ->whereNotNull('role')
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%")
+                        ->orWhere('role', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%");
+                });
+            })->get();
 
         $jadwals = JadwalKaryawan::with('user')->get();
 
@@ -148,13 +148,13 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'name'    => 'required|max:255',
-                'email'   => 'required|email|max:255|unique:users,email,' . $id,
-                'phone'   => 'required|numeric|digits_between:10,15',
+                'name' => 'required|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $id,
+                'phone' => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
-                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
-                'role'    => 'required|max:10',
-                'status'  => 'required|max:20',
+                'avatar' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'role' => 'nullable|max:10',
+                'status' => 'required|max:20',
                 'password' => 'nullable|min:8|confirmed',
             ]);
 
@@ -174,23 +174,23 @@ class UserController extends Controller
             }
 
             $updateData = [
-                'name'              => $request->name,
-                'email'             => $request->email,
-                'phone'             => $request->phone,
-                'address'           => $request->address,
-                'avatar'            => $fileName,
-                'role'              => $request->role,
-                'status'            => $request->status,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'avatar' => $fileName,
+                'role' => $request->role,
+                'status' => $request->status,
             ];
 
             if ($request->password) {
                 $updateData['password'] = bcrypt($request->password);
             }
 
-            $user = User::where('id', $id)->update($updateData);
+            $userOld->update($updateData);
 
             Log::info('Data karyawan berhasil diupdate.', [
-                'id'   => $id,
+                'id' => $id,
                 'name' => $request->name,
             ]);
 
@@ -204,7 +204,7 @@ class UserController extends Controller
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate data karyawan.', [
                 'error_message' => $e->getMessage(),
-                'user_input'    => $request->except('avatar'),
+                'user_input' => $request->except('avatar'),
             ]);
 
             return redirect()->back()
@@ -217,14 +217,14 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'id_user'     => 'required|exists:users,id',
+                'id_user' => 'required|exists:users,id',
                 'tipe_jadwal' => 'required|in:rutin,tanggal',
-                'tugas'       => 'required|string|max:255',
+                'tugas' => 'required|string|max:255',
             ]);
 
             $data = [
                 'id_user' => $request->id_user,
-                'tugas'   => $request->tugas,
+                'tugas' => $request->tugas,
             ];
 
             if ($request->tipe_jadwal === 'rutin') {
@@ -254,14 +254,14 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'id_user'     => 'required|exists:users,id',
+                'id_user' => 'required|exists:users,id',
                 'tipe_jadwal' => 'required|in:rutin,tanggal',
-                'tugas'       => 'required|string|max:255',
+                'tugas' => 'required|string|max:255',
             ]);
 
             $data = [
                 'id_user' => $request->id_user,
-                'tugas'   => $request->tugas,
+                'tugas' => $request->tugas,
             ];
 
             if ($request->tipe_jadwal === 'rutin') {
@@ -274,7 +274,7 @@ class UserController extends Controller
                 $data['rutin'] = null;
             }
 
-            JadwalKaryawan::where('id_jadwal', $id)->update($data);
+            JadwalKaryawan::query()->where(['id_jadwal' => $id])->update($data);
 
             return redirect()->back()->with('success', 'Jadwal karyawan berhasil diupdate!');
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -290,7 +290,7 @@ class UserController extends Controller
     public function deleteJadwal($id)
     {
         try {
-            JadwalKaryawan::where('id_jadwal', $id)->delete();
+            JadwalKaryawan::query()->where(['id_jadwal' => $id])->delete();
             return redirect()->back()->with('success', 'Jadwal karyawan berhasil dihapus!');
         } catch (Exception $e) {
             return redirect()->back()->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage());
@@ -301,13 +301,13 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'name'    => 'required|max:255',
-                'email'   => 'required|email|unique:users,email|max:255',
-                'phone'   => 'required|numeric|digits_between:10,15',
+                'name' => 'required|max:255',
+                'email' => 'required|email|unique:users,email|max:255',
+                'phone' => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
-                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
-                'role'    => 'nullable|max:10',
-                'status'  => 'nullable|max:20',
+                'avatar' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'role' => 'nullable|max:10',
+                'status' => 'nullable|max:20',
                 'password' => 'nullable|min:8|confirmed',
             ]);
 
@@ -321,18 +321,18 @@ class UserController extends Controller
             }
 
             $user = User::create([
-                'name'      => $request->name,
-                'email'     => $request->email,
-                'phone'     => $request->phone,
-                'address'   => $request->address,
-                'avatar'    => $fileName,
-                'role'      => $request->role,
-                'status'    => $request->status,
-                'password'  => $request->password ? bcrypt($request->password) : null,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'avatar' => $fileName,
+                'role' => $request->role,
+                'status' => $request->status,
+                'password' => $request->password ? bcrypt($request->password) : null,
             ]);
 
             Log::info('Data pelanggan berhasil ditambahkan.', [
-                'id'   => $user->id,
+                'id' => $user->id,
                 'name' => $user->name,
             ]);
 
@@ -346,12 +346,12 @@ class UserController extends Controller
         } catch (Exception $e) {
             Log::error('GAGAL menambahkan data pelanggan.', [
                 'error_message' => $e->getMessage(),
-                'user_input'    => $request->except('avatar'),
+                'user_input' => $request->except('avatar'),
             ]);
 
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())
-                ->withInput(); 
+                ->withInput();
         }
     }
 
@@ -359,17 +359,17 @@ class UserController extends Controller
     {
         $search = $request->input('search');
 
-        $pelanggan = User::whereNull('role')
-        ->where('status', 'Aktif')
-        ->when($search, function($query, $search) {
-            $query->where(function($q) use ($search) {
-                $q->where('name', 'like', "%{$search}%")
-                  ->orWhere('email', 'like', "%{$search}%")
-                  ->orWhere('phone', 'like', "%{$search}%")
-                  ->orWhere('address', 'like', "%{$search}%")
-                  ->orWhere('status', 'like', "%{$search}%");
-            });
-        })->get();
+        $pelanggan = User::query()->whereNull('role')
+            ->where(['status' => 'Aktif'])
+            ->when($search, function ($query, $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%")
+                        ->orWhere('email', 'like', "%{$search}%")
+                        ->orWhere('phone', 'like', "%{$search}%")
+                        ->orWhere('address', 'like', "%{$search}%")
+                        ->orWhere('status', 'like', "%{$search}%");
+                });
+            })->get();
 
         return view('admin.pelanggan', compact('pelanggan', 'search'));
     }
@@ -378,13 +378,13 @@ class UserController extends Controller
     {
         try {
             $request->validate([
-                'name'    => 'required|max:255',
-                'email'   => 'required|email|max:255|unique:users,email,' . $id,
-                'phone'   => 'required|numeric|digits_between:10,15',
+                'name' => 'required|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $id,
+                'phone' => 'required|numeric|digits_between:10,15',
                 'address' => 'required|max:255',
-                'avatar'  => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
-                'role'    => 'nullable|max:10',
-                'status'  => 'nullable|max:20',
+                'avatar' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'role' => 'nullable|max:10',
+                'status' => 'nullable|max:20',
                 'password' => 'nullable|min:8|confirmed',
             ]);
 
@@ -404,23 +404,23 @@ class UserController extends Controller
             }
 
             $updateData = [
-                'name'              => $request->name,
-                'email'             => $request->email,
-                'phone'             => $request->phone,
-                'address'           => $request->address,
-                'avatar'            => $fileName,
-                'role'              => $request->role,
-                'status'            => $request->status,
+                'name' => $request->name,
+                'email' => $request->email,
+                'phone' => $request->phone,
+                'address' => $request->address,
+                'avatar' => $fileName,
+                'role' => $request->role,
+                'status' => $request->status,
             ];
 
             if ($request->password) {
                 $updateData['password'] = bcrypt($request->password);
             }
 
-            $user = User::where('id', $id)->update($updateData);
+            $userOld->update($updateData);
 
             Log::info('Data pelanggan berhasil diupdate.', [
-                'id'   => $id,
+                'id' => $id,
                 'name' => $request->name,
             ]);
 
@@ -434,7 +434,7 @@ class UserController extends Controller
         } catch (Exception $e) {
             Log::error('GAGAL mengupdate data pelanggan.', [
                 'error_message' => $e->getMessage(),
-                'user_input'    => $request->except('avatar'),
+                'user_input' => $request->except('avatar'),
             ]);
 
             return redirect()->back()

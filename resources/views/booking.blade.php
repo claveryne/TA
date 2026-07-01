@@ -230,7 +230,7 @@
                             </div>
                         @else
                             <input type="hidden" name="nama_pemesan" value="{{ Auth::user()->name }}">
-                            <input type="hidden" name="telp_pemesan" value="{{ Auth::user()->phone ?? '-' }}">
+                            <input type="hidden" name="telp_pemesan" value="{{ Auth::user()->phone ?? '000000000000' }}">
                             <input type="hidden" name="email_pemesan" value="{{ Auth::user()->email }}">
                             <input type="hidden" name="alamat_pemesan" value="{{ Auth::user()->address ?? '-' }}">
                         @endif
