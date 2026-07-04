@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Fasilitas extends Model
 {
+    use SoftDeletes;
+
     protected $table = 'fasilitas';
     protected $primaryKey = 'id_fasilitas';
     public $incrementing = true;
@@ -13,47 +16,26 @@ class Fasilitas extends Model
 
     protected $fillable = [
         'nama_fasilitas',
-        'jenis_fasilitas',
         'jumlah_fasilitas',
-        'merk_fasilitas',
         'foto_fasilitas',
         'keterangan_fasilitas',
-        'status_fasilitas'
+        'status_fasilitas',
+        'id_jenis'
     ];
 
-    public function detailF() // Relasi ke detail fasilitas
+    public function jenisFasilitas() // Relasi ke jenis fasilitas
+    {
+        return $this->belongsTo(JenisFasilitas::class, 'id_jenis', 'id_jenis');
+    }
+
+    public function detailSpesifikasi() // Relasi ke detail spesifikasi
+    {
+        return $this->hasOne(DetailSpesifikasi::class, 'id_fasilitas', 'id_fasilitas');
+    }
+
+    public function detailF() // Relasi ke detail fasilitas (pemesanan)
     {
         return $this->hasMany(DetailFasilitas::class, 'id_fasilitas', 'id_fasilitas');
-    }
-
-    public function detailL() // Relasi ke detail lighting
-    {
-        return $this->hasOne(DetailLighting::class, 'id_fasilitas', 'id_fasilitas');
-    }
-
-    public function detailMM() // Relasi ke detail multimedia
-    {
-        return $this->hasOne(DetailMulmed::class, 'id_fasilitas', 'id_fasilitas');
-    }
-
-    public function detailM() // Relasi ke detail musik
-    {
-        return $this->hasOne(DetailMusik::class, 'id_fasilitas', 'id_fasilitas');
-    }
-
-    public function detailR() // Relasi ke detail ruang
-    {
-        return $this->hasOne(DetailRuang::class, 'id_fasilitas', 'id_fasilitas');
-    }
-
-    public function detailS() // Relasi ke detail sound
-    {
-        return $this->hasOne(DetailSound::class, 'id_fasilitas', 'id_fasilitas');
-    }
-
-    public function detailU() // Relasi ke detail umum
-    {
-        return $this->hasOne(DetailUmum::class, 'id_fasilitas', 'id_fasilitas');
     }
 
     public function pemeliharaan() // Relasi ke pemeliharaan

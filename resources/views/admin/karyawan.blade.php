@@ -350,8 +350,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer border-0 p-4 pt-0">
-                    <button type="submit" class="btn w-100 text-white fw-bold py-2" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
+                <div class="modal-footer border-0 p-4 pt-0 d-flex justify-content-between gap-3">
+                    <button type="button" id="btnHapusKaryawan" class="btn btn-outline-danger fw-bold py-2 flex-grow-1" style="border-radius: 10px; font-size: 1.1rem;">
+                        HAPUS
+                    </button>
+                    <button type="submit" class="btn text-white fw-bold py-2 flex-grow-1" style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
                         SIMPAN
                     </button>
                 </div>
@@ -521,6 +524,10 @@
 </div>
 
 <form id="formHapusJadwal" method="POST" style="display: none;">
+    @csrf
+</form>
+
+<form id="formHapusKaryawan" method="POST" style="display: none;">
     @csrf
 </form>
 
@@ -797,6 +804,11 @@
             modalEditKaryawan.querySelector('input[name="role"]').value = role;
             modalEditKaryawan.querySelector('textarea[name="address"]').value = address;
             
+            var btnHapusKaryawan = document.getElementById('btnHapusKaryawan');
+            if (btnHapusKaryawan) {
+                btnHapusKaryawan.setAttribute('data-id', id);
+            }
+
             var avatar = button.getAttribute('data-avatar');
             var previewLink = modalEditKaryawan.querySelector('#linkPreviewFotoKaryawan');
             
@@ -819,6 +831,41 @@
                 previewLink.onclick = null;
             }
         });
+
+        var btnHapusKaryawan = document.getElementById('btnHapusKaryawan');
+        if (btnHapusKaryawan) {
+            btnHapusKaryawan.addEventListener('click', function() {
+                var id = this.getAttribute('data-id');
+                if (!id) return;
+
+                Swal.fire({
+                    title: 'Konfirmasi',
+                    text: 'Apakah Anda yakin ingin menghapus dari tampilan?',
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yakin',
+                    cancelButtonText: 'Kembali',
+                    reverseButtons: true,
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Swal.fire({
+                            title: 'Menghapus...',
+                            text: 'Mohon tunggu sebentar',
+                            didOpen: () => Swal.showLoading(),
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            showConfirmButton: false
+                        });
+                        
+                        var formHapus = document.getElementById('formHapusKaryawan');
+                        formHapus.action = "{{ url('karyawan/delete') }}/" + id;
+                        setTimeout(() => formHapus.submit(), 300);
+                    }
+                });
+            });
+        }
     });
 </script>
 

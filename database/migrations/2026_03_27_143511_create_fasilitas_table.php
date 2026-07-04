@@ -14,13 +14,14 @@ return new class extends Migration
         Schema::create('fasilitas', function (Blueprint $table) {
             $table->bigIncrements('id_fasilitas');
             $table->string('nama_fasilitas', 255);
-            $table->string('jenis_fasilitas', 20);
             $table->integer('jumlah_fasilitas')->nullable();
-            $table->string('merk_fasilitas', 255);
             $table->string('foto_fasilitas', 255)->nullable();
             $table->string('keterangan_fasilitas', 255)->nullable();
             $table->string('status_fasilitas', 20);
             $table->timestamps();
+
+            $table->unsignedBigInteger('id_jenis');
+            $table->foreign('id_jenis')->references('id_jenis')->on('jenis_fasilitas')->onDelete('cascade');
         });
     }
 

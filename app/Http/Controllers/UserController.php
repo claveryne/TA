@@ -442,4 +442,34 @@ class UserController extends Controller
                 ->withInput();
         }
     }
+
+    public function destroyKaryawan($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+
+            Log::info('Data karyawan berhasil dihapus (soft delete).', ['id' => $id]);
+
+            return redirect()->back()->with('success', 'Data karyawan berhasil dihapus dari tampilan!');
+        } catch (Exception $e) {
+            Log::error('GAGAL menghapus data karyawan.', ['error_message' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus data karyawan: ' . $e->getMessage());
+        }
+    }
+
+    public function destroyPelanggan($id)
+    {
+        try {
+            $user = User::findOrFail($id);
+            $user->delete();
+
+            Log::info('Data pelanggan berhasil dihapus (soft delete).', ['id' => $id]);
+
+            return redirect()->back()->with('success', 'Data pelanggan berhasil dihapus dari tampilan!');
+        } catch (Exception $e) {
+            Log::error('GAGAL menghapus data pelanggan.', ['error_message' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus data pelanggan: ' . $e->getMessage());
+        }
+    }
 }

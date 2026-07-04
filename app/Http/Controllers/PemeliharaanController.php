@@ -31,7 +31,7 @@ class PemeliharaanController extends Controller
         })->get();
 
         $ruangan = Ruangan::all();
-        $fasilitas = Fasilitas::where('jenis_fasilitas', '!=', 'Ruangan')->get();
+        $fasilitas = Fasilitas::whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', '!=', 'Ruangan'); })->get();
 
         return view('admin.pemeliharaan', compact('pemeliharaan', 'search', 'ruangan', 'fasilitas'));
     }
@@ -76,10 +76,10 @@ class PemeliharaanController extends Controller
                 $statusUpdate = ($request->status_pemeliharaan == 'Berjalan') ? 'Pemeliharaan' : 'Tersedia';
                 $nama_ruangan = substr($request->nama_pemeliharaan, 10);
                 Ruangan::where('nama_ruangan', $nama_ruangan)->update(['status_ruangan' => $statusUpdate]);
-                Fasilitas::where('nama_fasilitas', $nama_ruangan)->where('jenis_fasilitas', 'Ruangan')->update(['status_fasilitas' => $statusUpdate]);
+                Fasilitas::where('nama_fasilitas', $nama_ruangan)->whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', 'Ruangan'); })->update(['status_fasilitas' => $statusUpdate]);
             } else if (strpos($request->nama_pemeliharaan, 'Fasilitas - ') === 0) {
                 $nama_fasilitas = substr($request->nama_pemeliharaan, 12);
-                $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->first();
+                $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', '!=', 'Ruangan'); })->first();
                 if ($fasilitas) {
                     $totalActive = Pemeliharaan::where('nama_pemeliharaan', $request->nama_pemeliharaan)
                         ->where('status_pemeliharaan', 'Berjalan')
@@ -159,10 +159,10 @@ class PemeliharaanController extends Controller
                 $statusUpdate = ($request->status_pemeliharaan == 'Berjalan') ? 'Pemeliharaan' : 'Tersedia';
                 $nama_ruangan = substr($request->nama_pemeliharaan, 10);
                 Ruangan::where('nama_ruangan', $nama_ruangan)->update(['status_ruangan' => $statusUpdate]);
-                Fasilitas::where('nama_fasilitas', $nama_ruangan)->where('jenis_fasilitas', 'Ruangan')->update(['status_fasilitas' => $statusUpdate]);
+                Fasilitas::where('nama_fasilitas', $nama_ruangan)->whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', 'Ruangan'); })->update(['status_fasilitas' => $statusUpdate]);
             } else if (strpos($request->nama_pemeliharaan, 'Fasilitas - ') === 0) {
                 $nama_fasilitas = substr($request->nama_pemeliharaan, 12);
-                $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->first();
+                $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', '!=', 'Ruangan'); })->first();
                 if ($fasilitas) {
                     $totalActive = Pemeliharaan::where('nama_pemeliharaan', $request->nama_pemeliharaan)
                         ->where('status_pemeliharaan', 'Berjalan')
@@ -212,10 +212,10 @@ class PemeliharaanController extends Controller
                 if (strpos($pemeliharaan->nama_pemeliharaan, 'Ruangan - ') === 0) {
                     $nama_ruangan = substr($pemeliharaan->nama_pemeliharaan, 10);
                     Ruangan::where('nama_ruangan', $nama_ruangan)->update(['status_ruangan' => 'Tersedia']);
-                    Fasilitas::where('nama_fasilitas', $nama_ruangan)->where('jenis_fasilitas', 'Ruangan')->update(['status_fasilitas' => 'Tersedia']);
+                    Fasilitas::where('nama_fasilitas', $nama_ruangan)->whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', 'Ruangan'); })->update(['status_fasilitas' => 'Tersedia']);
                 } else if (strpos($pemeliharaan->nama_pemeliharaan, 'Fasilitas - ') === 0) {
                     $nama_fasilitas = substr($pemeliharaan->nama_pemeliharaan, 12);
-                    $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->where('jenis_fasilitas', '!=', 'Ruangan')->first();
+                    $fasilitas = Fasilitas::where('nama_fasilitas', $nama_fasilitas)->whereHas('jenisFasilitas', function ($q) { $q->where('nama_jenis', '!=', 'Ruangan'); })->first();
                     if ($fasilitas) {
                         $totalActive = Pemeliharaan::where('nama_pemeliharaan', $pemeliharaan->nama_pemeliharaan)
                             ->where('status_pemeliharaan', 'Berjalan')

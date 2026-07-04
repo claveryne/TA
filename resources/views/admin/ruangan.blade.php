@@ -388,8 +388,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="submit" class="btn w-100 text-white fw-bold py-2"
+                    <div class="modal-footer border-0 p-4 pt-0 d-flex justify-content-between gap-3">
+                        <button type="button" id="btnHapusRuangan" class="btn btn-outline-danger fw-bold py-2 flex-grow-1" style="border-radius: 10px; font-size: 1.1rem;">
+                            HAPUS
+                        </button>
+                        <button type="submit" class="btn text-white fw-bold py-2 flex-grow-1"
                             style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
                             SIMPAN
                         </button>
@@ -404,6 +407,10 @@
             </div>
         </div>
     </div>
+
+    <form id="formHapusRuangan" method="POST" style="display: none;">
+        @csrf
+    </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -504,6 +511,11 @@
                 modalEditRuangan.querySelector('input[name="id_ruangan"]').value = id;
                 modalEditRuangan.querySelector('input[name="nama_ruangan"]').value = nama;
 
+                var btnHapusRuangan = document.getElementById('btnHapusRuangan');
+                if (btnHapusRuangan) {
+                    btnHapusRuangan.setAttribute('data-id', id);
+                }
+
                 var selectStatus = modalEditRuangan.querySelector('select[name="status_ruangan"]');
                 selectStatus.value = status;
 
@@ -560,6 +572,41 @@
                     previewLink.onclick = null;
                 }
             });
+
+            var btnHapusRuangan = document.getElementById('btnHapusRuangan');
+            if (btnHapusRuangan) {
+                btnHapusRuangan.addEventListener('click', function() {
+                    var id = this.getAttribute('data-id');
+                    if (!id) return;
+
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: 'Apakah Anda yakin ingin menghapus dari tampilan?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yakin',
+                        cancelButtonText: 'Kembali',
+                        reverseButtons: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menghapus...',
+                                text: 'Mohon tunggu sebentar',
+                                didOpen: () => Swal.showLoading(),
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                showConfirmButton: false
+                            });
+                            
+                            var formHapus = document.getElementById('formHapusRuangan');
+                            formHapus.action = "{{ url('ruangan/delete') }}/" + id;
+                            setTimeout(() => formHapus.submit(), 300);
+                        }
+                    });
+                });
+            }
         });
     </script>
 

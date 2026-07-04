@@ -54,7 +54,7 @@ class PemesananController extends Controller
 
         $pemesanans = $query->orderByRaw('updated_at DESC')->get();
         $ruangans = Ruangan::where(['status_ruangan' => 'Tersedia'])->get();
-        $fasilitases = Fasilitas::where(['status_fasilitas' => 'Tersedia'])->get()->groupBy(fn($f) => $f->jenis_fasilitas);
+        $fasilitases = Fasilitas::where(['status_fasilitas' => 'Tersedia'])->get()->groupBy(fn($f) => $f->jenisFasilitas->nama_jenis ?? 'Lainnya');
         return view('admin.pemesanan', compact('pemesanans', 'activeTab', 'ruangans', 'fasilitases'));
     }
 
@@ -170,8 +170,8 @@ class PemesananController extends Controller
 
     private function getFasilitasStats()
     {
-        $fasilitasNonElektronik = Fasilitas::whereIn('jenis_fasilitas', ['Umum', 'Ruangan'])->sum('jumlah_fasilitas');
-        $fasilitasElektronik = Fasilitas::whereNotIn('jenis_fasilitas', ['Umum', 'Ruangan'])->sum('jumlah_fasilitas');
+        $fasilitasNonElektronik = Fasilitas::whereHas('jenisFasilitas', function ($q) { $q->whereIn('nama_jenis', ['Umum', 'Ruangan']); })->sum('jumlah_fasilitas');
+        $fasilitasElektronik = Fasilitas::whereHas('jenisFasilitas', function ($q) { $q->whereNotIn('nama_jenis', ['Umum', 'Ruangan']); })->sum('jumlah_fasilitas');
         $totalJenisFasilitas = $fasilitasNonElektronik + $fasilitasElektronik;
 
         $totalFasilitas = Fasilitas::sum('jumlah_fasilitas');
@@ -224,7 +224,7 @@ class PemesananController extends Controller
             return $f;
         })->filter(function ($f) {
             return $f->jumlah_fasilitas > 0;
-        })->groupBy(fn($f) => $f->jenis_fasilitas);
+        })->groupBy(fn($f) => $f->jenisFasilitas->nama_jenis ?? 'Lainnya');
     }
 
     public function home()
@@ -414,9 +414,10 @@ class PemesananController extends Controller
                 $room = Ruangan::find($request->id_ruangan);
                 if ($room) {
                     $corresponding_facility = Fasilitas::where([
-                        ['nama_fasilitas', $room->nama_ruangan],
-                        ['jenis_fasilitas', 'Ruangan']
-                    ])->first();
+                        ['nama_fasilitas', $room->nama_ruangan]
+                    ])->whereHas('jenisFasilitas', function ($q) {
+                        $q->where('nama_jenis', 'Ruangan');
+                    })->first();
                     if ($corresponding_facility && in_array($corresponding_facility->id_fasilitas, $request->fasilitas)) {
                         throw new Exception('Ruangan ' . $room->nama_ruangan . ' tidak dapat dipilih sebagai fasilitas tambahan karena sudah menjadi ruangan utama.');
                     }
@@ -444,9 +445,10 @@ class PemesananController extends Controller
             $room = Ruangan::find($request->id_ruangan);
             if ($room) {
                 $corresponding_facility = Fasilitas::where([
-                    ['nama_fasilitas', $room->nama_ruangan],
-                    ['jenis_fasilitas', 'Ruangan']
-                ])->first();
+                    ['nama_fasilitas', $room->nama_ruangan]
+                ])->whereHas('jenisFasilitas', function ($q) {
+                    $q->where('nama_jenis', 'Ruangan');
+                })->first();
                 if ($corresponding_facility) {
                     $isFacilityBookedQuery = DetailFasilitas::where(['id_fasilitas' => $corresponding_facility->id_fasilitas])
                         ->whereHas('pemesanan', function ($query) use ($request, $ignorePemesananId) {
@@ -493,7 +495,7 @@ class PemesananController extends Controller
                             })->sum('jumlah_fasilitas');
 
                         // cek fasilitas ruangan tidak sedang dibooking
-                        if ($facility->jenis_fasilitas === 'Ruangan') {
+                        if ($facility->jenisFasilitas && $facility->jenisFasilitas->nama_jenis === 'Ruangan') {
                             $corresponding_room = Ruangan::where(['nama_ruangan' => $facility->nama_fasilitas])->first();
                             if ($corresponding_room) {
                                 $isRoomBookedDirectlyQuery = Pemesanan::where(['id_ruangan' => $corresponding_room->id_ruangan])
@@ -567,7 +569,7 @@ class PemesananController extends Controller
 
             DB::beginTransaction();
 
-            // Cek bentrok menggunakan helper method
+            // cek bentrok helper method
             $this->checkBookingConflicts($request, $id);
 
             $fileName = $pemesanan->bukti_pemesanan;

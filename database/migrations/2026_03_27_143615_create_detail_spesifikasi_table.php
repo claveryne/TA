@@ -11,9 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('detail_sounds', function (Blueprint $table) {
-            $table->bigIncrements('id_detailS');
-            $table->string('warnaS', 255);
+        Schema::create('detail_spesifikasi', function (Blueprint $table) {
+            $table->bigIncrements('id_detail');
+            $table->string('merk', 255)->nullable();
+            $table->string('warna', 100)->nullable();
+            $table->string('ukuran', 100)->nullable();
+            $table->integer('kapasitas')->nullable();
             $table->timestamps();
 
             $table->unsignedBigInteger('id_fasilitas');
@@ -26,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('detail_sounds');
+        Schema::dropIfExists('detail_spesifikasi');
     }
 };

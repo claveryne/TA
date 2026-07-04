@@ -41,10 +41,16 @@ Route::middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function 
     Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan');
     Route::post('/ruangan', [RuanganController::class, 'store'])->name('ruangan.store');
     Route::post('/ruangan/edit/{id}', [RuanganController::class, 'update'])->name('ruangan.update');
+    Route::post('/ruangan/delete/{id}', [RuanganController::class, 'destroy'])->name('ruangan.delete');
 
     Route::get('/fasilitas', [FasilitasController::class, 'index'])->name('fasilitas');
     Route::post('/fasilitas', [FasilitasController::class, 'store'])->name('fasilitas.store');
     Route::post('/fasilitas/edit/{id}', [FasilitasController::class, 'update'])->name('fasilitas.update');
+    Route::post('/fasilitas/delete/{id}', [FasilitasController::class, 'destroy'])->name('fasilitas.delete');
+    
+    Route::post('/fasilitas/jenis', [FasilitasController::class, 'storeJenis'])->name('fasilitas.jenis.store');
+    Route::post('/fasilitas/jenis/edit/{id}', [FasilitasController::class, 'updateJenis'])->name('fasilitas.jenis.update');
+    Route::post('/fasilitas/jenis/delete/{id}', [FasilitasController::class, 'deleteJenis'])->name('fasilitas.jenis.delete');
     
     Route::get('/pemesanan', [PemesananController::class, 'index'])->name('pemesanan');
     Route::post('/pemesanan/laporan', [PemesananController::class, 'cetakLaporan'])->name('pemesanan.laporan');
@@ -60,10 +66,12 @@ Route::middleware(['auth', 'is_admin', 'prevent-back-history'])->group(function 
     Route::get('/pelanggan', [UserController::class, 'indexPelanggan'])->name('pelanggan');
     Route::post('/pelanggan', [UserController::class, 'storePelanggan'])->name('pelanggan.store');
     Route::post('/pelanggan/edit/{id}', [UserController::class, 'updatePelanggan'])->name('pelanggan.update');
+    Route::post('/pelanggan/delete/{id}', [UserController::class, 'destroyPelanggan'])->name('pelanggan.delete');
 
     Route::get('/karyawan', [UserController::class, 'indexKaryawan'])->name('karyawan');
     Route::post('/karyawan', [UserController::class, 'storeKaryawan'])->name('karyawan.store');
     Route::post('/karyawan/edit/{id}', [UserController::class, 'updateKaryawan'])->name('karyawan.update');
+    Route::post('/karyawan/delete/{id}', [UserController::class, 'destroyKaryawan'])->name('karyawan.delete');
     
     Route::post('/karyawan/jadwal', [UserController::class, 'storeJadwal'])->name('karyawan.jadwal.store');
     Route::post('/karyawan/jadwal/edit/{id}', [UserController::class, 'updateJadwal'])->name('karyawan.jadwal.update');

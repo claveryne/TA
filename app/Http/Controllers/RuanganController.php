@@ -146,4 +146,19 @@ class RuanganController extends Controller
                 ->withInput();
         }
     }
+
+    public function destroy($id)
+    {
+        try {
+            $ruangan = Ruangan::findOrFail($id);
+            $ruangan->delete();
+
+            Log::info('Data ruangan berhasil dihapus (soft delete).', ['id_ruangan' => $id]);
+
+            return redirect()->back()->with('success', 'Data ruangan berhasil dihapus dari tampilan!');
+        } catch (Exception $e) {
+            Log::error('GAGAL menghapus data ruangan.', ['error_message' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus data ruangan: ' . $e->getMessage());
+        }
+    }
 }

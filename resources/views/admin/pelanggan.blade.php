@@ -261,7 +261,7 @@
         </div>
     </div>
 
-    <!-- MODAL TAMBAH pelanggan -->
+    <!-- MODAL TAMBAH PELANGGAN -->
     <div class="modal fade" id="modalTambahPelanggan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content" style="border-radius: 16px; border: none; overflow: hidden;">
@@ -374,8 +374,11 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer border-0 p-4 pt-0">
-                        <button type="submit" class="btn w-100 text-white fw-bold py-2"
+                    <div class="modal-footer border-0 p-4 pt-0 d-flex justify-content-between gap-3">
+                        <button type="button" id="btnHapusPelanggan" class="btn btn-outline-danger fw-bold py-2 flex-grow-1" style="border-radius: 10px; font-size: 1.1rem;">
+                            HAPUS
+                        </button>
+                        <button type="submit" class="btn text-white fw-bold py-2 flex-grow-1"
                             style="background-color: #612713; border-radius: 10px; font-size: 1.1rem;">
                             SIMPAN
                         </button>
@@ -390,6 +393,10 @@
             </div>
         </div>
     </div>
+
+    <form id="formHapusPelanggan" method="POST" style="display: none;">
+        @csrf
+    </form>
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -485,12 +492,19 @@
                 var form = document.getElementById('formEditPelanggan');
                 form.action = url;
 
-                // Isi nilai inputan di dalam modal
+                // Update input values
                 modalEditPelanggan.querySelector('input[name="id"]').value = id;
                 modalEditPelanggan.querySelector('input[name="name"]').value = name;
-                modalEditPelanggan.querySelector('select[name="status"]').value = status;
                 modalEditPelanggan.querySelector('input[name="email"]').value = email;
                 modalEditPelanggan.querySelector('input[name="phone"]').value = phone;
+
+                var selectStatus = modalEditPelanggan.querySelector('select[name="status"]');
+                selectStatus.value = status;
+                
+                var btnHapusPelanggan = document.getElementById('btnHapusPelanggan');
+                if (btnHapusPelanggan) {
+                    btnHapusPelanggan.setAttribute('data-id', id);
+                }
                 modalEditPelanggan.querySelector('input[name="role"]').value = role;
                 modalEditPelanggan.querySelector('textarea[name="address"]').value = address;
 
@@ -516,6 +530,41 @@
                     previewLink.onclick = null;
                 }
             });
+
+            var btnHapusPelanggan = document.getElementById('btnHapusPelanggan');
+            if (btnHapusPelanggan) {
+                btnHapusPelanggan.addEventListener('click', function() {
+                    var id = this.getAttribute('data-id');
+                    if (!id) return;
+
+                    Swal.fire({
+                        title: 'Konfirmasi',
+                        text: 'Apakah Anda yakin ingin menghapus dari tampilan?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Yakin',
+                        cancelButtonText: 'Kembali',
+                        reverseButtons: true,
+                        confirmButtonColor: '#dc3545',
+                        cancelButtonColor: '#6c757d'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            Swal.fire({
+                                title: 'Menghapus...',
+                                text: 'Mohon tunggu sebentar',
+                                didOpen: () => Swal.showLoading(),
+                                allowOutsideClick: false,
+                                allowEscapeKey: false,
+                                showConfirmButton: false
+                            });
+                            
+                            var formHapus = document.getElementById('formHapusPelanggan');
+                            formHapus.action = "{{ url('pelanggan/delete') }}/" + id;
+                            setTimeout(() => formHapus.submit(), 300);
+                        }
+                    });
+                });
+            }
         });
     </script>
 

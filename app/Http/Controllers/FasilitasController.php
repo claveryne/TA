@@ -5,12 +5,8 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Models\Fasilitas;
-use App\Models\DetailMulmed;
-use App\Models\DetailSound;
-use App\Models\DetailLighting;
-use App\Models\DetailMusik;
-use App\Models\DetailUmum;
-use App\Models\DetailRuang;
+use App\Models\JenisFasilitas;
+use App\Models\DetailSpesifikasi;
 use Illuminate\Support\Facades\Log;
 
 class FasilitasController extends Controller
@@ -19,25 +15,19 @@ class FasilitasController extends Controller
     {
         try {
             $request->validate([
-                'nama_fasilitas' => 'required|max:255',
-                'jenis_fasilitas' => 'required|max:20',
-                'jumlah_fasilitas' => 'required|integer|min:1',
-                'merk_fasilitas' => 'required|max:255',
-                'foto_fasilitas' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
-                'keterangan_fasilitas' => 'nullable|max:255',
-                'status_fasilitas' => 'required|max:20',
-
-                'warnaMM' => 'nullable|string|max:255',
-                'warnaS' => 'nullable|string|max:255',
-                'warnaL' => 'nullable|string|max:255',
-                'warnaM' => 'nullable|string|max:255',
-                'warnaU' => 'nullable|string|max:255',
-                'ukuranU' => 'nullable|numeric|min:0',
-                'ukuranR' => 'nullable|numeric|min:0',
-                'kapasitasR' => 'nullable|integer|min:1',
+                'nama_fasilitas'      => 'required|max:255',
+                'id_jenis'            => 'required|exists:jenis_fasilitas,id_jenis',
+                'jumlah_fasilitas'    => 'required|integer|min:1',
+                'foto_fasilitas'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'keterangan_fasilitas'=> 'nullable|max:255',
+                'status_fasilitas'    => 'required|max:20',
+                
+                'merk'     => 'nullable|string|max:255',
+                'warna'    => 'nullable|string|max:255',
+                'ukuran'   => 'nullable|string|max:100',
+                'kapasitas'=> 'nullable|integer|min:1',
             ]);
 
-        
             Log::info('Mencoba menambahkan data fasilitas baru: ' . $request->nama_fasilitas);
 
             $fileName = null;
@@ -48,33 +38,27 @@ class FasilitasController extends Controller
             }
 
             $fasilitas = Fasilitas::create([
-                'nama_fasilitas' => $request->nama_fasilitas,
-                'jenis_fasilitas' => $request->jenis_fasilitas,
-                'jumlah_fasilitas' => $request->jumlah_fasilitas,
-                'merk_fasilitas' => $request->merk_fasilitas,
-                'foto_fasilitas' => $fileName,
+                'nama_fasilitas'       => $request->nama_fasilitas,
+                'id_jenis'             => $request->id_jenis,
+                'jumlah_fasilitas'     => $request->jumlah_fasilitas,
+                'foto_fasilitas'       => $fileName,
                 'keterangan_fasilitas' => $request->keterangan_fasilitas,
-                'status_fasilitas' => $request->status_fasilitas,
+                'status_fasilitas'     => $request->status_fasilitas,
             ]);
 
-            if ($request->jenis_fasilitas === 'Multimedia') {
-                DetailMulmed::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'warnaMM' => $request->warnaMM]);
-            } elseif ($request->jenis_fasilitas === 'Sound System') {
-                DetailSound::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'warnaS' => $request->warnaS]);
-            } elseif ($request->jenis_fasilitas === 'Lighting') {
-                DetailLighting::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'warnaL' => $request->warnaL]);
-            } elseif ($request->jenis_fasilitas === 'Alat Musik') {
-                DetailMusik::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'warnaM' => $request->warnaM]);
-            } elseif ($request->jenis_fasilitas === 'Umum') {
-                DetailUmum::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'warnaU' => $request->warnaU, 'ukuranU' => $request->ukuranU]);
-            } elseif ($request->jenis_fasilitas === 'Ruangan') {
-                DetailRuang::create(['id_fasilitas' => $fasilitas->id_fasilitas, 'ukuranR' => $request->ukuranR, 'kapasitasR' => $request->kapasitasR]);
+            if ($request->merk || $request->warna || $request->ukuran || $request->kapasitas) {
+                DetailSpesifikasi::create([
+                    'id_fasilitas' => $fasilitas->id_fasilitas,
+                    'merk'         => $request->merk,
+                    'warna'        => $request->warna,
+                    'ukuran'       => $request->ukuran,
+                    'kapasitas'    => $request->kapasitas,
+                ]);
             }
 
-
             Log::info('Data fasilitas berhasil ditambahkan.', [
-                'id_fasilitas' => $fasilitas->id_fasilitas,
-                'nama_fasilitas' => $fasilitas->nama_fasilitas,
+                'id_fasilitas'  => $fasilitas->id_fasilitas,
+                'nama_fasilitas'=> $fasilitas->nama_fasilitas,
             ]);
 
             return redirect()->back()->with('success', 'Data fasilitas berhasil ditambahkan!');
@@ -87,7 +71,7 @@ class FasilitasController extends Controller
         } catch (\Exception $e) {
             Log::error('GAGAL menambahkan data fasilitas.', [
                 'error_message' => $e->getMessage(),
-                'user_input' => $request->except('foto_fasilitas'),
+                'user_input'    => $request->except('foto_fasilitas'),
             ]);
 
             return redirect()->back()
@@ -99,14 +83,13 @@ class FasilitasController extends Controller
     public function index(Request $request)
     {
         $search = $request->input('search');
-        $jenis = $request->input('jenis');
+        $jenis  = $request->input('jenis');
         $status = $request->input('status');
-        $sortNama = $request->input('sort_nama');
 
-        $fasilitas = Fasilitas::with(['detailMM', 'detailL', 'detailM', 'detailR', 'detailS', 'detailU'])
+        $fasilitas = Fasilitas::with(['jenisFasilitas', 'detailSpesifikasi'])
             ->whereIn('status_fasilitas', ['Tersedia', 'Terpakai', 'Pemeliharaan'])
             ->when($jenis, function ($query, $jenis) {
-                return $query->where('jenis_fasilitas', $jenis);
+                return $query->where('id_jenis', $jenis);
             })
             ->when($status, function ($query, $status) {
                 return $query->where('status_fasilitas', $status);
@@ -114,42 +97,40 @@ class FasilitasController extends Controller
             ->when($search, function ($query, $search) {
                 $query->where(function ($q) use ($search) {
                     $q->where('nama_fasilitas', 'like', "%{$search}%")
-                        ->orWhere('jenis_fasilitas', 'like', "%{$search}%")
                         ->orWhere('jumlah_fasilitas', 'like', "%{$search}%")
-                        ->orWhere('merk_fasilitas', 'like', "%{$search}%")
                         ->orWhere('keterangan_fasilitas', 'like', "%{$search}%")
-                        ->orWhere('status_fasilitas', 'like', "%{$search}%");
+                        ->orWhere('status_fasilitas', 'like', "%{$search}%")
+                        ->orWhereHas('jenisFasilitas', function ($q2) use ($search) {
+                            $q2->where('nama_jenis', 'like', "%{$search}%");
+                        });
                 });
             })
             ->orderBy('updated_at', 'desc')
             ->get();
 
-        return view('admin.fasilitas', compact('fasilitas', 'search'));
+        $jenisFasilitas = JenisFasilitas::orderBy('nama_jenis')->get();
+
+        return view('admin.fasilitas', compact('fasilitas', 'search', 'jenisFasilitas'));
     }
 
     public function update(Request $request, $id)
     {
         try {
             $request->validate([
-                'nama_fasilitas' => 'required|max:255',
-                'jenis_fasilitas' => 'required|max:20',
-                'jumlah_fasilitas' => 'required|integer|min:1',
-                'merk_fasilitas' => 'required|max:255',
-                'foto_fasilitas' => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
-                'keterangan_fasilitas' => 'nullable|max:255',
-                'status_fasilitas' => 'required|max:20',
-
-                'warnaMM' => 'nullable|string|max:255',
-                'warnaS' => 'nullable|string|max:255',
-                'warnaL' => 'nullable|string|max:255',
-                'warnaM' => 'nullable|string|max:255',
-                'warnaU' => 'nullable|string|max:255',
-                'ukuranU' => 'nullable|numeric|min:0',
-                'ukuranR' => 'nullable|numeric|min:0',
-                'kapasitasR' => 'nullable|integer|min:1',
+                'nama_fasilitas'      => 'required|max:255',
+                'id_jenis'            => 'required|exists:jenis_fasilitas,id_jenis',
+                'jumlah_fasilitas'    => 'required|integer|min:1',
+                'foto_fasilitas'      => 'nullable|image|mimes:jpg,png,jpeg|max:30720',
+                'keterangan_fasilitas'=> 'nullable|max:255',
+                'status_fasilitas'    => 'required|max:20',
+                
+                'merk'     => 'nullable|string|max:255',
+                'warna'    => 'nullable|string|max:255',
+                'ukuran'   => 'nullable|string|max:100',
+                'kapasitas'=> 'nullable|integer|min:1',
             ]);
 
-            Log::info('Mencoba mengupdate data fasilitas: ' . $request->nama_fasilitas);
+            Log::info('Mencoba mengupdate data fasilitas ID: ' . $id);
 
             $fasilitasOld = Fasilitas::find($id);
 
@@ -165,49 +146,27 @@ class FasilitasController extends Controller
             }
 
             Fasilitas::where('id_fasilitas', $id)->update([
-                'nama_fasilitas' => $request->nama_fasilitas,
-                'jenis_fasilitas' => $request->jenis_fasilitas,
-                'jumlah_fasilitas' => $request->jumlah_fasilitas,
-                'merk_fasilitas' => $request->merk_fasilitas,
-                'foto_fasilitas' => $fileName,
+                'nama_fasilitas'       => $request->nama_fasilitas,
+                'id_jenis'             => $request->id_jenis,
+                'jumlah_fasilitas'     => $request->jumlah_fasilitas,
+                'foto_fasilitas'       => $fileName,
                 'keterangan_fasilitas' => $request->keterangan_fasilitas,
-                'status_fasilitas' => $request->status_fasilitas,
+                'status_fasilitas'     => $request->status_fasilitas,
             ]);
 
-            if ($fasilitasOld->jenis_fasilitas !== $request->jenis_fasilitas) {
-                if ($fasilitasOld->jenis_fasilitas === 'Multimedia') {
-                    DetailMulmed::where('id_fasilitas', $id)->delete();
-                } elseif ($fasilitasOld->jenis_fasilitas === 'Sound System') {
-                    DetailSound::where('id_fasilitas', $id)->delete();
-                } elseif ($fasilitasOld->jenis_fasilitas === 'Lighting') {
-                    DetailLighting::where('id_fasilitas', $id)->delete();
-                } elseif ($fasilitasOld->jenis_fasilitas === 'Alat Musik') {
-                    DetailMusik::where('id_fasilitas', $id)->delete();
-                } elseif ($fasilitasOld->jenis_fasilitas === 'Umum') {
-                    DetailUmum::where('id_fasilitas', $id)->delete();
-                } elseif ($fasilitasOld->jenis_fasilitas === 'Ruangan') {
-                    DetailRuang::where('id_fasilitas', $id)->delete();
-                }
-            }
-
-            if ($request->jenis_fasilitas === 'Multimedia') {
-                DetailMulmed::updateOrCreate(['id_fasilitas' => $id], ['warnaMM' => $request->warnaMM]);
-            } elseif ($request->jenis_fasilitas === 'Sound System') {
-                DetailSound::updateOrCreate(['id_fasilitas' => $id], ['warnaS' => $request->warnaS]);
-            } elseif ($request->jenis_fasilitas === 'Lighting') {
-                DetailLighting::updateOrCreate(['id_fasilitas' => $id], ['warnaL' => $request->warnaL]);
-            } elseif ($request->jenis_fasilitas === 'Alat Musik') {
-                DetailMusik::updateOrCreate(['id_fasilitas' => $id], ['warnaM' => $request->warnaM]);
-            } elseif ($request->jenis_fasilitas === 'Umum') {
-                DetailUmum::updateOrCreate(['id_fasilitas' => $id], ['warnaU' => $request->warnaU, 'ukuranU' => $request->ukuranU]);
-            } elseif ($request->jenis_fasilitas === 'Ruangan') {
-                DetailRuang::updateOrCreate(['id_fasilitas' => $id], ['ukuranR' => $request->ukuranR, 'kapasitasR' => $request->kapasitasR]);
-            }
-
+            DetailSpesifikasi::updateOrCreate(
+                ['id_fasilitas' => $id],
+                [
+                    'merk'     => $request->merk,
+                    'warna'    => $request->warna,
+                    'ukuran'   => $request->ukuran,
+                    'kapasitas'=> $request->kapasitas,
+                ]
+            );
 
             Log::info('Data fasilitas berhasil diupdate.', [
-                'id_fasilitas' => $id,
-                'nama_fasilitas' => $request->nama_fasilitas,
+                'id_fasilitas'  => $id,
+                'nama_fasilitas'=> $request->nama_fasilitas,
             ]);
 
             return redirect()->back()->with('success', 'Data fasilitas berhasil diupdate!');
@@ -220,12 +179,74 @@ class FasilitasController extends Controller
         } catch (\Exception $e) {
             Log::error('GAGAL mengupdate data fasilitas.', [
                 'error_message' => $e->getMessage(),
-                'user_input' => $request->except('foto_fasilitas'),
+                'user_input'    => $request->except('foto_fasilitas'),
             ]);
 
             return redirect()->back()
                 ->with('error', 'Terjadi kesalahan sistem: ' . $e->getMessage())
                 ->withInput();
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $fasilitas = Fasilitas::findOrFail($id);
+            $fasilitas->delete();
+
+            Log::info('Data fasilitas berhasil dihapus (soft delete).', ['id_fasilitas' => $id]);
+
+            return redirect()->back()->with('success', 'Data fasilitas berhasil dihapus dari tampilan!');
+        } catch (\Exception $e) {
+            Log::error('GAGAL menghapus data fasilitas.', ['error_message' => $e->getMessage()]);
+            return redirect()->back()->with('error', 'Gagal menghapus data fasilitas: ' . $e->getMessage());
+        }
+    }
+
+    public function storeJenis(Request $request)
+    {
+        try {
+            $request->validate([
+                'nama_jenis' => 'required|string|max:255',
+            ]);
+
+            JenisFasilitas::create([
+                'nama_jenis' => $request->nama_jenis,
+            ]);
+
+            return redirect()->back()->with('success', 'Jenis fasilitas berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menambahkan jenis fasilitas: ' . $e->getMessage());
+        }
+    }
+
+    public function updateJenis(Request $request, $id)
+    {
+        try {
+            $request->validate([
+                'nama_jenis' => 'required|string|max:255',
+            ]);
+
+            $jenis = JenisFasilitas::findOrFail($id);
+            $jenis->update([
+                'nama_jenis' => $request->nama_jenis,
+            ]);
+
+            return redirect()->back()->with('success', 'Jenis fasilitas berhasil diupdate!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengupdate jenis fasilitas: ' . $e->getMessage());
+        }
+    }
+
+    public function deleteJenis($id)
+    {
+        try {
+            $jenis = JenisFasilitas::findOrFail($id);
+            $jenis->delete();
+
+            return redirect()->back()->with('success', 'Jenis fasilitas berhasil dihapus!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal menghapus jenis fasilitas: ' . $e->getMessage());
         }
     }
 }

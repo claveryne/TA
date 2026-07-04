@@ -4,16 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class DetailMusik extends Model
+class DetailSpesifikasi extends Model
 {
-    protected $table = 'detail_musiks';
-    protected $primaryKey = 'id_detailM';
+    protected $table = 'detail_spesifikasi';
+    protected $primaryKey = 'id_detail';
     public $incrementing = true;
     protected $keyType = 'int';
 
     protected $fillable = [
-        'id_fasilitas',
-        'warnaM'
+        'merk',
+        'warna',
+        'ukuran',
+        'kapasitas',
+        'id_fasilitas'
     ];
 
     public function fasilitas() // Relasi ke fasilitas
