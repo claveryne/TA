@@ -100,7 +100,8 @@
                 <th class="text-center" width="25%">Nama Pemeliharaan</th>
                 <th class="text-center" width="10%">Jumlah</th>
                 <th class="text-center" width="20%">Jenis Pemeliharaan</th>
-                <th class="text-center" width="20%">Tanggal Pemeliharaan</th>
+                <th class="text-center" width="20%">Tanggal Mulai</th>
+                <th class="text-center" width="20%">Tanggal Selesai</th>
                 <th class="text-center" width="15%">Status</th>
                 <th class="text-right" width="25%">Biaya (Rp)</th>
             </tr>
@@ -113,18 +114,19 @@
                     <td class="text-center">{{ $item->jumlah_pemeliharaan ?? '-' }}</td>
                     <td class="text-center">{{ $item->jenis_pemeliharaan }}</td>
                     <td class="text-center">{{ \Carbon\Carbon::parse($item->tglMulai_pemeliharaan)->translatedFormat('d F Y') }}</td>
+                    <td class="text-center">{{ \Carbon\Carbon::parse($item->tglSelesai_pemeliharaan)->translatedFormat('d F Y') }}</td>
                     <td class="text-center">{{ $item->status_pemeliharaan }}</td>
                     <td class="text-right">{{ number_format($item->biaya_pemeliharaan, 0, ',', '.') }}</td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="7" class="text-center">Tidak ada data pemeliharaan untuk periode ini.</td>
+                    <td colspan="8" class="text-center">Tidak ada data pemeliharaan untuk periode ini.</td>
                 </tr>
             @endforelse
             
             @if($pemeliharaan->count() > 0)
                 <tr class="total-row">
-                    <td colspan="6" class="text-right">TOTAL KESELURUHAN BIAYA:</td>
+                    <td colspan="7" class="text-right">TOTAL BIAYA:</td>
                     <td class="text-right">{{ number_format($totalBiaya, 0, ',', '.') }}</td>
                 </tr>
             @endif
